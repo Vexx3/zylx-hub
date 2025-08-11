@@ -1,4 +1,5 @@
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 
 local Player = Players.LocalPlayer
@@ -150,12 +151,12 @@ noclip:OnChanged(function(enabled)
 end)
 
 infJump:OnChanged(function(enabled)
-    if not enabled then return end
-
     if infJumpConnection then
         infJumpConnection:Disconnect()
         infJumpConnection = nil
     end
+
+    if not enabled then return end
 
     infJumpDebounce = false
 
