@@ -190,7 +190,9 @@ local autoRejoin = Groupboxes.PlayerOthers:AddToggle("AutoRejoin", {
 local rejoinButton = Groupboxes.PlayerOthers:AddButton("Rejoin", {
     Text = "Rejoin",
     Tooltip = "Rejoins the game",
-    Func = rejoin
+    Func = function()
+        rejoin()
+    end
 })
 
 local serverHop = Groupboxes.PlayerOthers:AddButton("ServerHop", {
