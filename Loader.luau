@@ -2,6 +2,7 @@ local GuiService = game:GetService("GuiService")
 local HttpService = game:GetService("HttpService")
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
+local ProximityPromptService = game:GetService("ProximityPromptService")
 local RunService = game:GetService("RunService")
 local TeleportService = game:GetService("TeleportService")
 local UserInputService = game:GetService("UserInputService")
@@ -31,6 +32,9 @@ local brightLoop
 
 local antiAfkConnection
 local disabledRobloxConnections = {}
+
+local promptButtonHoldBegan = nil
+local staffWatchJoin
 
 local function rejoin()
     if #Players:GetPlayers() <= 1 then
@@ -64,31 +68,32 @@ local Tabs = {
 }
 
 local Groupboxes = {
-    Movement = Tabs.Player:AddLeftGroupbox("Movement", "user-round-plus"),
-    Visual = Tabs.Player:AddRightGroupbox("Visual", "eye"),
-    PlayerOthers = Tabs.Player:AddLeftGroupbox("Others", "box"),
+    General = Tabs.Player:AddLeftGroupbox("General", "user-round-plus"),
+    Game = Tabs.Player:AddRightGroupbox("Game", "eye"),
+    Server = Tabs.Player:AddLeftGroupbox("Server", "server"),
+    Security = Tabs.Player:AddRightGroupbox("Security", "shield"),
     UISettingsGroup = Tabs.UISettings:AddLeftGroupbox("Menu", "wrench"),
 }
 
-local walkSpeed = Groupboxes.Movement:AddSlider("WalkSpeedSlider", {
+local walkSpeed = Groupboxes.General:AddSlider("WalkSpeedSlider", {
     Text = "WalkSpeed",
     Default = Humanoid.WalkSpeed,
     Min = Humanoid.WalkSpeed,
-    Max = 500,
+    Max = 300,
     Rounding = 1,
     Tooltip = "Change your walkspeed"
 })
 
-local jumpPower = Groupboxes.Movement:AddSlider("JumpPowerSlider", {
+local jumpPower = Groupboxes.General:AddSlider("JumpPowerSlider", {
     Text = "Jump Power",
     Default = Humanoid.UseJumpPower and Humanoid.JumpPower or Humanoid.JumpHeight,
     Min = Humanoid.UseJumpPower and Humanoid.JumpPower or Humanoid.JumpHeight,
-    Max = 500,
+    Max = 300,
     Rounding = 1,
     Tooltip = "Change your jump power"
 })
 
-local fov = Groupboxes.Movement:AddSlider("FOVSlider", {
+local fov = Groupboxes.General:AddSlider("FOVSlider", {
     Text = "Field Of View",
     Default = workspace.CurrentCamera.FieldOfView,
     Max = 120,
@@ -96,17 +101,22 @@ local fov = Groupboxes.Movement:AddSlider("FOVSlider", {
     Tooltip = "Adjusts field of view"
 })
 
-local noclip = Groupboxes.Movement:AddToggle("Noclip", {
+local noclip = Groupboxes.General:AddToggle("Noclip", {
     Text = "Noclip",
     Tooltip = "Allows you to go through objects"
 })
 
-local infJump = Groupboxes.Movement:AddToggle("InfJump", {
+local infJump = Groupboxes.General:AddToggle("InfJump", {
     Text = "Infinite Jump",
     Tooltip = "Allows you to jump multiple times before hitting the ground"
 })
 
-local lowGraphics = Groupboxes.Visual:AddButton("LowGraphics", {
+local instantPrompt = Groupboxes.General:AddToggle("Instant Prompt", {
+    Text = "Instant Prompt",
+    Tooltip = "Disable the cooldown for proximity prompts"
+})
+
+local lowGraphics = Groupboxes.Game:AddButton("LowGraphics", {
     Text = "Low Graphics",
     Tooltip = "Lowers game quality to boost FPS",
     Func = function()
@@ -154,7 +164,7 @@ local lowGraphics = Groupboxes.Visual:AddButton("LowGraphics", {
     end
 })
 
-local noFog = Groupboxes.Visual:AddButton("NoFog", {
+local noFog = Groupboxes.Game:AddButton("NoFog", {
     Text = "No Fog",
     Tooltip = "Removes fog",
     Func = function()
@@ -168,34 +178,35 @@ local noFog = Groupboxes.Visual:AddButton("NoFog", {
     end
 })
 
-local fullBright = Groupboxes.Visual:AddToggle("FullBright", {
+local fullBright = Groupboxes.Game:AddToggle("FullBright", {
     Text = "Full Bright",
     Tooltip = "Makes the map brighter / more visible"
 })
 
-local noRender = Groupboxes.Visual:AddToggle("NoRender", {
+local noRender = Groupboxes.Game:AddToggle("NoRender", {
     Text = "No Render",
     Tooltip = "Disable 3d rendering to decrease the amount of CPU the client uses"
 })
 
-local antiAfk = Groupboxes.PlayerOthers:AddToggle("AntiAfk", {
+local antiAfk = Groupboxes.Server:AddToggle("AntiAfk", {
     Text = "Anti AFK",
     Default = true,
     Tooltip = "Prevents the game from kicking you for being idle/afk"
 })
 
-local autoRejoin = Groupboxes.PlayerOthers:AddToggle("AutoRejoin", {
+local autoRejoin = Groupboxes.Server:AddToggle("AutoRejoin", {
     Text = "Auto Rejoin",
+    Default = true,
     Tooltip = "Auto rejoins the server if you get kicked/disconnected"
 })
 
-local rejoinButton = Groupboxes.PlayerOthers:AddButton("Rejoin", {
+local rejoinButton = Groupboxes.Server:AddButton("Rejoin", {
     Text = "Rejoin",
     Tooltip = "Rejoins the game",
     Func = rejoin
 })
 
-local serverHop = Groupboxes.PlayerOthers:AddButton("ServerHop", {
+local serverHop = Groupboxes.Server:AddButton("ServerHop", {
     Text = "Server Hop",
     Tooltip = "Teleports you to a different server",
     Func = function()
@@ -359,6 +370,27 @@ infJump:OnChanged(function(enabled)
         task.wait()
         infJumpDebounce = false
     end)
+end)
+
+instantPrompt:OnChanged(function(enabled)
+    if promptButtonHoldBegan then
+        promptButtonHoldBegan:Disconnect()
+        promptButtonHoldBegan = nil
+    end
+
+    if not enabled then return end
+
+    if fireproximityprompt then
+        promptButtonHoldBegan = ProximityPromptService.PromptButtonHoldBegan:Connect(function(prompt)
+            fireproximityprompt(prompt)
+        end)
+    else
+        Library:Notify({
+            Title = "Incompatible Exploit",
+            Description = "Your exploit does not support this feature (missing fireproximityprompt)",
+            Time = 10
+        })
+    end
 end)
 
 fullBright:OnChanged(function(enabled)
