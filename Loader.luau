@@ -60,12 +60,14 @@ local Tabs = {
     Main = Window:AddTab("Main", "house", "Core features and primary functions"),
     Misc = Window:AddTab("Misc", "shuffle", "Extra tools and miscellaneous features"),
     Player = Window:AddTab("Player", "user", "Customization and settings for your player"),
+    UISettings = Window:AddTab("UI Settings", "settings", "Customize the UI Settings"),
 }
 
 local Groupboxes = {
     Movement = Tabs.Player:AddLeftGroupbox("Movement", "user-round-plus"),
     Visual = Tabs.Player:AddRightGroupbox("Visual", "eye"),
     PlayerOthers = Tabs.Player:AddLeftGroupbox("Others", "box"),
+    UISettingsGroup = Tabs.UISettings:AddLeftGroupbox("Menu", "wrench"),
 }
 
 local walkSpeed = Groupboxes.Movement:AddSlider("WalkSpeedSlider", {
@@ -89,7 +91,7 @@ local jumpPower = Groupboxes.Movement:AddSlider("JumpPowerSlider", {
 local fov = Groupboxes.Movement:AddSlider("FOVSlider", {
     Text = "Field Of View",
     Default = workspace.CurrentCamera.FieldOfView,
-    Max = 500,
+    Max = 120,
     Rounding = 1,
     Tooltip = "Adjusts field of view"
 })
@@ -221,6 +223,51 @@ local serverHop = Groupboxes.PlayerOthers:AddButton("ServerHop", {
         end
     end
 })
+
+Groupboxes.UISettingsGroup:AddToggle("KeybindMenuOpen", {
+	Default = Library.KeybindFrame.Visible,
+	Text = "Open Keybind Menu",
+	Callback = function(value)
+		Library.KeybindFrame.Visible = value
+	end,
+})
+Groupboxes.UISettingsGroup:AddToggle("ShowCustomCursor", {
+	Text = "Custom Cursor",
+	Default = true,
+	Callback = function(Value)
+		Library.ShowCustomCursor = Value
+	end,
+})
+Groupboxes.UISettingsGroup:AddDropdown("NotificationSide", {
+	Values = { "Left", "Right" },
+	Default = "Right",
+
+	Text = "Notification Side",
+
+	Callback = function(Value)
+		Library:SetNotifySide(Value)
+	end,
+})
+Groupboxes.UISettingsGroup:AddDropdown("DPIDropdown", {
+	Values = { "50%", "75%", "100%", "125%", "150%", "175%", "200%" },
+	Default = "100%",
+
+	Text = "DPI Scale",
+
+	Callback = function(Value)
+		Value = Value:gsub("%%", "")
+		local DPI = tonumber(Value)
+
+		Library:SetDPIScale(DPI)
+	end,
+})
+Groupboxes.UISettingsGroup:AddDivider()
+Groupboxes.UISettingsGroup:AddLabel("Menu bind")
+    :AddKeyPicker("MenuKeybind", { Text = "Menu keybind", Default = "RightShift", NoUI = true  })
+
+Groupboxes.UISettingsGroup:AddButton("Unload", function()
+	Library:Unload()
+end)
 
 local function disconnectConnections(list)
     for _, connection in list do
