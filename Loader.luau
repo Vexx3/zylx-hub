@@ -22,6 +22,8 @@ local originalFOV = workspace.CurrentCamera.FieldOfView
 local PlaceId = game.PlaceId
 local JobId = game.JobId
 
+local GROUP_ID = 1200769
+
 local HumanoidConnections = {
     WalkSpeed = {},
     JumpPower = {}
@@ -47,6 +49,44 @@ local function rejoin()
         TeleportService:Teleport(PlaceId, Player)
     else
         TeleportService:TeleportToPlaceInstance(PlaceId, JobId, Player)
+    end
+end
+
+local staffRank = {"Core", "Group Lead - Create", "Group Lead", "Town Hall Leads", "Town Hall Collaborators", "Intern"}
+
+local function getStaffRole(player)
+    local result = {}
+    if player:IsInGroup(GROUP_ID) then
+        local role = player:GetRoleInGroup(GROUP_ID)
+        for _, staffRole in staffRank do
+            if role == staffRole then
+                result.Role = staffRole
+                result.Staff = true
+            end
+        end
+    end
+
+    return result
+end
+
+local function formatUsername(player)
+    if player.DisplayName ~= player.Name then
+        return `player.Name ({player.DisplayName})`
+    end
+    return player.Name
+end
+
+local function doStaffAction(action, staffList)
+    if action == "Kick" then
+        Player:Kick(table.concat(staffList, ",\n"))
+    elseif action == "Shutdown" then
+        game:Shutdown()
+    elseif action == "Notify" then
+        Library:Notify({
+            Title = "Anti Mod",
+            Description = table.concat(staffList, ",\n"),
+            Time = 10
+        })
     end
 end
 
@@ -530,7 +570,41 @@ autoRejoin:OnChanged(function(enabled)
 end)
 
 antiMod:OnChanged(function(enabled)
-    print(`Anti Mod: {enabled}`)
+    if staffWatchJoin then
+        staffWatchJoin:Disconnect()
+        staffWatchJoin = nil
+    end
+
+    if not enabled then return end
+
+    if game.CreatorType == Enum.CreatorType.Group then
+        local found = {}
+
+        staffWatchJoin = Players.PlayerAdded:Connect(function(player)
+            local result = getStaffRole(player)
+            if result.Staff then
+                -- the action which is kick / notify / shutdown
+            end
+        end)
+        
+        for _, player in Players:GetPlayers() do
+            local result = getStaffRole(player)
+            if result.Staff then
+                table.insert(found, `{formatUsername} is a {result.Role}`)
+                doStaffAction(Options.ActionMod.Value, found)
+            end
+        end
+
+        if #found > 0 then
+            doStaffAction(Options.ActionMod.Value, found)
+        end
+    else
+        Library:Notify({
+            Title = "Anti Mod",
+            Description = "Game is not owned by a group",
+            Time = 10
+        })
+    end
 end)
 
 actionMod:OnChanged(function(value)
