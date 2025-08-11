@@ -71,7 +71,7 @@ local Groupboxes = {
     General = Tabs.Player:AddLeftGroupbox("General", "user-round-plus"),
     Game = Tabs.Player:AddRightGroupbox("Game", "eye"),
     Server = Tabs.Player:AddLeftGroupbox("Server", "server"),
-    Security = Tabs.Player:AddRightGroupbox("Security", "shield"),
+    Safety = Tabs.Player:AddRightGroupbox("Safety", "shield"),
     UISettingsGroup = Tabs.UISettings:AddLeftGroupbox("Menu", "wrench"),
 }
 
@@ -233,6 +233,12 @@ local serverHop = Groupboxes.Server:AddButton("ServerHop", {
             })
         end
     end
+})
+
+Groupboxes.Safety:AddToggle("AntiMod", {
+    Title = "Anti Mod",
+    Default = true,
+    Tooltip = "Checks if a staff member of the game joins the server then do the action",
 })
 
 Groupboxes.UISettingsGroup:AddToggle("KeybindMenuOpen", {
