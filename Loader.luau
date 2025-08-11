@@ -80,15 +80,18 @@ local jumpPower = Groupboxes.General:AddDependencyBox()
 local fov = Groupboxes.General:AddDependencyBox()
 
 local walkSpeedToggle = Groupboxes.General:AddToggle("walkSpeedToggle", {
-    Text = "Change your walkspeed"
+    Text = "WalkSpeed",
+    Tooltip = "Change your walkspeed"
 })
 
 local jumpPowerToggle = Groupboxes.General:AddToggle("jumpPowerToggle", {
-    Text = "Change your jump power"
+    Text = "Jump Power",
+    Tooltip = "Change your jump power"
 })
 
 local fovToggle = Groupboxes.General:AddToggle("fovToggle", {
-    Text = "Adjusts field of view"
+    Text = "FOV",
+    Tooltip = "Adjusts field of view"
 })
 
 walkSpeed:SetupDependencies({
@@ -104,7 +107,6 @@ fov:SetupDependencies({
 })
 
 local walkSpeedSlider = walkSpeed:AddSlider("WalkSpeedSlider", {
-    Text = "WalkSpeed",
     Default = Humanoid.WalkSpeed,
     Min = Humanoid.WalkSpeed,
     Max = 300,
@@ -112,7 +114,6 @@ local walkSpeedSlider = walkSpeed:AddSlider("WalkSpeedSlider", {
 })
 
 local jumpPowerSlider = jumpPower:AddSlider("JumpPowerSlider", {
-    Text = "Jump Power",
     Default = Humanoid.UseJumpPower and Humanoid.JumpPower or Humanoid.JumpHeight,
     Min = Humanoid.UseJumpPower and Humanoid.JumpPower or Humanoid.JumpHeight,
     Max = 300,
@@ -120,7 +121,6 @@ local jumpPowerSlider = jumpPower:AddSlider("JumpPowerSlider", {
 })
 
 local fovSlider = fov:AddSlider("FOVSlider", {
-    Text = "FOV",
     Default = workspace.CurrentCamera.FieldOfView,
     Max = 120,
     Rounding = 1
