@@ -44,8 +44,8 @@ local Tabs = {
 
 local Groupboxes = {
     Movement = Tabs.Player:AddLeftGroupbox("Movement", "user-round-plus"),
-    Visual = Tabs.Player:AddRightGroupbox("Visual", "eye")
-    PlayerOthers = Tabs.Player:AddLeftGroupbox("Others", "box")
+    Visual = Tabs.Player:AddRightGroupbox("Visual", "eye"),
+    PlayerOthers = Tabs.Player:AddLeftGroupbox("Others", "box"),
 }
 
 local walkSpeed = Groupboxes.Movement:AddSlider("WalkSpeedSlider", {
@@ -100,7 +100,7 @@ local lowGraphics = Groupboxes.Visual:AddButton("LowGraphics", {
     			instance.TopSurface = "SmoothNoOutlines"
             elseif instance:IsA("Decal") then
 			    instance.Transparency = 1
-		    elseif instance:IsA("ParticleEmitter") or v:IsA("Trail") then
+		    elseif instance:IsA("ParticleEmitter") or instance:IsA("Trail") then
     			instance.Lifetime = NumberRange.new(0)
             end
         end
@@ -124,7 +124,7 @@ local lowGraphics = Groupboxes.Visual:AddButton("LowGraphics", {
 
 local fullBright = Groupboxes.Visual:AddToggle("FullBright", {
     Text = "Full Bright",
-    Tooltip = "Makes the map brighter / more visible
+    Tooltip = "Makes the map brighter / more visible"
 })
 
 local function disconnectConnections(list)
