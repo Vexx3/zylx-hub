@@ -1,10 +1,11 @@
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-local Terrain = game:GetService("Terrain")
 local UserInputService = game:GetService("UserInputService")
 
 local Player = Players.LocalPlayer
+
+local Terrain = workspace:FindFirstChildOfClass("Terrain")
 
 local Character = Player.Character or Player.CharacterAdded:Wait()
 local Humanoid = Character:FindFirstChildWhichIsA("Humanoid")
