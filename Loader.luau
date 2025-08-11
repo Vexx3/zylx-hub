@@ -122,6 +122,20 @@ local lowGraphics = Groupboxes.Visual:AddButton("LowGraphics", {
     end
 })
 
+local noFog = Groupboxes.Visual:AddButton("NoFog", {
+    Text = "No Fog",
+    Tooltip = "Removes fog",
+    Func = function()
+        Lighting.FogEnd = 100000
+
+        for _, lighting in Lighting:GetDescendants() do
+            if lighting:IsA("Atmosphere") then
+                lighting:Destroy()
+            end
+        end
+    end
+})
+
 local fullBright = Groupboxes.Visual:AddToggle("FullBright", {
     Text = "Full Bright",
     Tooltip = "Makes the map brighter / more visible"
