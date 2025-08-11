@@ -438,7 +438,7 @@ end)
 ThemeManager:SetLibrary(Library)
 SaveManager:SetLibrary(Library)
 
-SaveManager:BuildConfigSection(Groupboxes.UISettings)
+SaveManager:BuildConfigSection(Tabs.UISettings)
 
-ThemeManager:ApplyToTab(Groupboxes.UISettings)
+ThemeManager:ApplyToTab(Tabs.UISettings)
 SaveManager:LoadAutoloadConfig()
