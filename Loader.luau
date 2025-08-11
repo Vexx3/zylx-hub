@@ -98,6 +98,8 @@ local SaveManager = loadstring(game:HttpGet(`{repo}addons/SaveManager.lua`))()
 local Options = Library.Options
 local Toggles = Library.Toggles
 
+Library.NotifyOnError = true
+
 local Window = Library:CreateWindow({
     Title = "Zylx Hub",
     Footer = "v0.0.1",
