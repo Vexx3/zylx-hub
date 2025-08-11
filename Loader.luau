@@ -621,8 +621,11 @@ Player.CharacterAdded:Connect(function(character)
     Character = character
     Humanoid = character:WaitForChild("Humanoid")
 
-    setupWalkSpeed(Options.WalkSpeedSlider.Value)
-    setupJumpPower(Options.JumpPowerSlider.Value)
+    local walkSpeedValue = if Toggles.walkSpeedToggle.Value then Options.WalkSpeedSlider.Value else originalWalkSpeed
+    local jumpPowerValue = if Toggles.jumpPowerToggle.Value then Options.JumpPowerSlider.Value else originalJumpValue
+
+    setupWalkSpeed(walkSpeedValue)
+    setupJumpPower(jumpPowerValue)
 end)
 
 ThemeManager:SetLibrary(Library)
