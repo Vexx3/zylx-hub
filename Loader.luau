@@ -148,6 +148,16 @@ local instantPrompt = Groupboxes.General:AddToggle("Instant Prompt", {
     Tooltip = "Disable the cooldown for proximity prompts"
 })
 
+local fullBright = Groupboxes.Game:AddToggle("FullBright", {
+    Text = "Full Bright",
+    Tooltip = "Makes the map brighter / more visible"
+})
+
+local noRender = Groupboxes.Game:AddToggle("NoRender", {
+    Text = "No Render",
+    Tooltip = "Disable 3d rendering to decrease the amount of CPU the client uses"
+})
+
 local lowGraphics = Groupboxes.Game:AddButton("LowGraphics", {
     Text = "Low Graphics",
     Tooltip = "Lowers game quality to boost FPS",
@@ -208,16 +218,6 @@ local noFog = Groupboxes.Game:AddButton("NoFog", {
             end
         end
     end
-})
-
-local fullBright = Groupboxes.Game:AddToggle("FullBright", {
-    Text = "Full Bright",
-    Tooltip = "Makes the map brighter / more visible"
-})
-
-local noRender = Groupboxes.Game:AddToggle("NoRender", {
-    Text = "No Render",
-    Tooltip = "Disable 3d rendering to decrease the amount of CPU the client uses"
 })
 
 local antiAfk = Groupboxes.Server:AddToggle("AntiAfk", {
