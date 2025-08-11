@@ -364,15 +364,15 @@ local function setupJumpPower(power)
     end))
 end
 
-walkSpeed:OnChanged(function(value)
+walkSpeedSlider:OnChanged(function(value)
     setupWalkSpeed(value)
 end)
 
-jumpPower:OnChanged(function(value)
+jumpPowerSlider:OnChanged(function(value)
     setupJumpPower(value)
 end)
 
-fov:OnChanged(function(value)
+fovSlider:OnChanged(function(value)
     if not Toggles.fovToggle then return end
     
     workspace.CurrentCamera.FieldOfView = value
