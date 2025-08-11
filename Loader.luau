@@ -235,10 +235,16 @@ local serverHop = Groupboxes.Server:AddButton("ServerHop", {
     end
 })
 
-Groupboxes.Safety:AddToggle("AntiMod", {
-    Title = "Anti Mod",
+local antiMod = Groupboxes.Safety:AddToggle("AntiMod", {
+    Text = "Anti Mod",
     Default = true,
     Tooltip = "Checks if a staff member of the game joins the server then do the action",
+})
+
+local actionMod = Groupboxes.Safety:AddDropdown("ActionMod", {
+    Values = {"Shutdown", "Kick", "Notify"},
+    Default = "Kick",
+    Tooltip = "Action to do if the staff is in the game",
 })
 
 Groupboxes.UISettingsGroup:AddToggle("KeybindMenuOpen", {
@@ -463,6 +469,14 @@ autoRejoin:OnChanged(function(enabled)
     GuiService.ErrorMessageChanged:Connect(function()
         rejoin()
     end)
+end)
+
+antiMod:OnChanged(function(enabled)
+    print(`Anti Mod: {enabled}`)
+end)
+
+actionMod:OnChanged(function(value)
+    print(`Action Mod: {value}`)
 end)
 
 Player.CharacterAdded:Connect(function(character)
