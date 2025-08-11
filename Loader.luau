@@ -98,16 +98,6 @@ local SaveManager = loadstring(game:HttpGet(`{repo}addons/SaveManager.lua`))()
 local Options = Library.Options
 local Toggles = Library.Toggles
 
-task.defer(function()
-    for name, toggle in Toggles do
-        if toggle.Value and type(toggle.Callback) == "function" then
-            task.spawn(function()
-                toggle.Callback(true)
-            end)
-        end
-    end
-end)
-
 local Window = Library:CreateWindow({
     Title = "Zylx Hub",
     Footer = "v0.0.1",
@@ -618,6 +608,16 @@ antiMod:OnChanged(function(enabled)
 
         antiMod:SetValue(false)
         antiMod:Disabled(true)
+    end
+end)
+
+task.defer(function()
+    for _, toggle in Toggles do
+        if toggle.Value and type(toggle.Callback) == "function" then
+            task.spawn(function()
+                toggle.Callback(true)
+            end)
+        end
     end
 end)
 
