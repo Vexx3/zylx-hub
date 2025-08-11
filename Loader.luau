@@ -8,6 +8,11 @@ local TeleportService = game:GetService("TeleportService")
 local UserInputService = game:GetService("UserInputService")
 local VirtualUser = cloneref(game:GetService("VirtualUser"))
 
+type HumanoidConnectionTable = {
+    WalkSpeed: { RBXScriptConnection },
+    JumpPower: { RBXScriptConnection }
+}
+
 local Player = Players.LocalPlayer
 
 local Terrain = workspace:FindFirstChildOfClass("Terrain")
@@ -24,23 +29,21 @@ local JobId = game.JobId
 
 local GROUP_ID = 1200769
 
-local HumanoidConnections = {
+local HumanoidConnections: HumanoidConnectionTable = {
     WalkSpeed = {},
     JumpPower = {}
 }
 
-local noclipping = nil
+local brightLoop: RBXScriptConnection?
+local noclipping: RBXScriptConnection?
+local antiAfkConnection: RBXScriptConnection?
+local infJumpConnection: RBXScriptConnection?
+local promptButtonHoldBegan: RBXScriptConnection?
+local staffWatchJoin: RBXScriptConnection?
 
-local infJumpConnection
-local infJumpDebounce = false
+local infJumpDebounce: boolean = false
 
-local brightLoop
-
-local antiAfkConnection
-local disabledRobloxConnections = {}
-
-local promptButtonHoldBegan = nil
-local staffWatchJoin
+local disabledRobloxConnections: { RBXScriptConnection } = {}
 
 local function rejoin()
     if #Players:GetPlayers() <= 1 then
@@ -52,10 +55,10 @@ local function rejoin()
     end
 end
 
-local staffRank = {"Core", "Group Lead - Create", "Group Lead", "Town Hall Leads", "Town Hall Collaborators", "Intern"}
+local staffRank: {string} = {"Core", "Group Lead - Create", "Group Lead", "Town Hall Leads", "Town Hall Collaborators", "Intern"}
 
-local function getStaffRole(player)
-    local result = {}
+local function getStaffRole(player: Player)
+    local result: { Role: string?, Staff: boolean? } = {}
     if player:IsInGroup(GROUP_ID) then
         local role = player:GetRoleInGroup(GROUP_ID)
         for _, staffRole in staffRank do
@@ -69,14 +72,14 @@ local function getStaffRole(player)
     return result
 end
 
-local function formatUsername(player)
+local function formatUsername(player: Player): string
     if player.DisplayName ~= player.Name then
         return `player.Name ({player.DisplayName})`
     end
     return player.Name
 end
 
-local function doStaffAction(action, staffList)
+local function doStaffAction(action: "Kick" | "Shutdown" | "Notify", staffList: {string})
     if action == "Kick" then
         Player:Kick(table.concat(staffList, ",\n"))
     elseif action == "Shutdown" then
@@ -367,20 +370,20 @@ Groupboxes.UISettingsGroup:AddButton("Unload", function()
 	Library:Unload()
 end)
 
-local function disconnectConnections(list)
+local function disconnectConnections(list: { RBXScriptConnection })
     for _, connection in list do
         connection:Disconnect()
     end
     table.clear(list)
 end
 
-local function updateWalkSpeed(speed)
+local function updateWalkSpeed(speed: number)
     if Humanoid then
         Humanoid.WalkSpeed = speed
     end
 end
 
-local function updateJumpPower(power)
+local function updateJumpPower(power: number)
     if Humanoid then
         if Humanoid.UseJumpPower then
             Humanoid.JumpPower = power
@@ -390,7 +393,7 @@ local function updateJumpPower(power)
     end
 end
 
-local function setupWalkSpeed(speed)        
+local function setupWalkSpeed(speed: number)        
     disconnectConnections(HumanoidConnections.WalkSpeed)
     updateWalkSpeed(speed)
 
@@ -399,7 +402,7 @@ local function setupWalkSpeed(speed)
     end))
 end
 
-local function setupJumpPower(power)    
+local function setupJumpPower(power: number)    
     disconnectConnections(HumanoidConnections.JumpPower)
     updateJumpPower(power)
 
@@ -592,7 +595,7 @@ antiMod:OnChanged(function(enabled)
         return
     end
 
-    local found = {}
+    local found: {string} = {}
 
     staffWatchJoin = Players.PlayerAdded:Connect(function(player)
         local result = getStaffRole(player)
