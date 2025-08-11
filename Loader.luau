@@ -1,7 +1,11 @@
+local GuiService = game:GetService("GuiService")
+local HttpService = game:GetService("HttpService")
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
+loca TeleportService = game:GetService("TeleportService")
 local UserInputService = game:GetService("UserInputService")
+local VirtualUser = cloneref(game:GetService("VirtualUser"))
 
 local Player = Players.LocalPlayer
 
@@ -9,6 +13,9 @@ local Terrain = workspace:FindFirstChildOfClass("Terrain")
 
 local Character = Player.Character or Player.CharacterAdded:Wait()
 local Humanoid = Character:FindFirstChildWhichIsA("Humanoid")
+
+local PlaceId = game.PlaceId
+local JobId = game.JobId
 
 local HumanoidConnections = {
     WalkSpeed = {},
@@ -21,6 +28,16 @@ local infJumpConnection
 local infJumpDebounce = false
 
 local brightLoop
+
+local function rejoin()
+    if #Players:GetPlayers() <= 1 then
+        Player:Kick("\nRejoining...")
+        task.wait()
+        TeleportService:Teleport(PlaceId, Player)
+    else
+        TeleportService:TeleportToPlaceInstance(PlaceId, JobId, Player)
+    end
+end
 
 local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
 local Library = loadstring(game:HttpGet(`{repo}Library.lua`))()
@@ -52,6 +69,7 @@ local walkSpeed = Groupboxes.Movement:AddSlider("WalkSpeedSlider", {
     Text = "WalkSpeed",
     Default = Humanoid.WalkSpeed,
     Min = Humanoid.WalkSpeed,
+    Max = 500,
     Rounding = 1,
     Tooltip = "Change your walkspeed"
 })
@@ -60,8 +78,17 @@ local jumpPower = Groupboxes.Movement:AddSlider("JumpPowerSlider", {
     Text = "Jump Power",
     Default = Humanoid.UseJumpPower and Humanoid.JumpPower or Humanoid.JumpHeight,
     Min = Humanoid.UseJumpPower and Humanoid.JumpPower or Humanoid.JumpHeight,
+    Max = 500,
     Rounding = 1,
     Tooltip = "Change your jump power"
+})
+
+local fov = Groupboxes.Movement:AddSlider("FOVSlider", {
+    Text = "Field Of View",
+    Default = workspace.CurrentCamera.FieldOfView,
+    Max = 500,
+    Rounding = 1,
+    Tooltip = "Adjusts field of view"
 })
 
 local noclip = Groupboxes.Movement:AddToggle("Noclip", {
@@ -141,6 +168,57 @@ local fullBright = Groupboxes.Visual:AddToggle("FullBright", {
     Tooltip = "Makes the map brighter / more visible"
 })
 
+local noRender = Groupboxes.Visual:AddToggle("NoRender", {
+    Text = "No Render",
+    Tooltip = "Disable 3d rendering to decrease the amount of CPU the client uses"
+})
+
+local antiAfk = Groupboxes.PlayerOthers:AddToggle("AntiAfk", {
+    Text = "Anti AFK",
+    Default = true,
+    Tooltip = "Prevents the game from kicking you for being idle/afk"
+})
+
+local autoRejoin = Groupboxes.PlayerOthers:AddToggle("AutoRejoin", {
+    Text = "Auto Rejoin",
+    Tooltip = "Auto rejoins the server if you get kicked/disconnected"
+})
+
+local rejoinButton = Groupboxes.PlayerOthers:AddButton("Rejoin", {
+    Text = "Rejoin",
+    Tooltip = "Rejoins the game",
+    Func = rejoin
+})
+
+local serverHop = Groupboxes.PlayerOthers:AddButton("ServerHop", {
+    Text = "Server Hop",
+    Tooltip = "Teleports you to a different server"
+    Func = function()
+        -- credits for IY
+        local servers = {}
+        local request = game:HttpGet(`https://games.roblox.com/v1/games/{PlaceId}/servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true`)
+        local body = HttpService:JSONDecode(request)
+
+        if body and body.data then
+            for _, info in body.data do
+                if type(info) == "table" and tonumber(info.playing) and tonumber(info.maxPlayers) and info.playing < info.maxPlayers and info.id ~= JobId then
+                    table.insert(servers, 1, info.id)
+                end
+            end
+        end
+
+        if #servers > 0 then
+            TeleportService:TeleportToPlaceInstance(PlaceId, servers[math.random(1, #servers)], Player)
+        else
+            Library:Notify({
+                Title = "Server Hop",
+                Description = "Couldn't find a server."
+                Time = 10
+            })
+        end
+    end
+})
+
 local function disconnectConnections(list)
     for _, connection in list do
         connection:Disconnect()
@@ -192,9 +270,14 @@ jumpPower:OnChanged(function(value)
     setupJumpPower(value)
 end)
 
+fov:OnChanged(function(value)
+    workspace.CurrentCamera.FieldOfView = value
+end)
+
 noclip:OnChanged(function(enabled)
     if noclipping then
         noclipping:Disconnect()
+        noclipping = nil
     end
 
     if not enabled then return end
@@ -212,6 +295,7 @@ end)
 infJump:OnChanged(function(enabled)
     if infJumpConnection then
         infJumpConnection:Disconnect()
+        infJumpConnection = nil
     end
 
     if not enabled then return end
@@ -230,6 +314,7 @@ end)
 fullBright:OnChanged(function(enabled)
     if brightLoop then
         brightLoop:Disconnect()
+        brightLoop = nil
     end
 
     if not enabled then return end
@@ -240,6 +325,45 @@ fullBright:OnChanged(function(enabled)
         Lighting.FogEnd = 100000
         Lighting.GlobalShadows = false
         Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
+    end)
+end)
+
+noRender:OnChanged(function(enabled)
+    if enabled then
+        RunService:Set3dRenderingEnabled(false)
+    else
+        RunService:Set3dRenderingEnabled(true)
+    end
+end)
+
+antiAfk:OnChanged(function(enabled)
+    if antiAfkConnection then
+        antiAfkConnection:Disconnect()
+        antiAfkConnection = nil
+    end
+
+    if not enabled then return end
+
+    local getcon = getconnections
+    if getcon then
+        for _, connection in getcon(Player.Idled) do
+            if connection["Disable"] then
+                connection:Disable()
+            elseif connection["Disconnect"] then
+                connection:Disconnect()
+            end
+        end
+    else
+        antiAfkConnection = Player.Idled:Connect(function()
+            VirtualUser:CaptureController()
+            VirtualUser:ClickButton(Vector2.new())
+        end)
+    end
+end)
+
+autoRejoin:OnChanged(function(enabled)
+    GuiService.ErrorMessageChanged(function()
+        rejoin()
     end)
 end)
 
