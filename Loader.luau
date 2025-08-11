@@ -15,6 +15,10 @@ local Terrain = workspace:FindFirstChildOfClass("Terrain")
 local Character = Player.Character or Player.CharacterAdded:Wait()
 local Humanoid = Character:FindFirstChildWhichIsA("Humanoid")
 
+local originalWalkSpeed = Humanoid.WalkSpeed
+local originalJumpValue = Humanoid.UseJumpPower and Humanoid.JumpPower or Humanoid.JumpHeight
+local originalFOV = workspace.CurrentCamera.FieldOfView
+
 local PlaceId = game.PlaceId
 local JobId = game.JobId
 
@@ -107,6 +111,7 @@ fov:SetupDependencies({
 })
 
 local walkSpeedSlider = walkSpeed:AddSlider("WalkSpeedSlider", {
+    Text = "WalkSpeed",
     Default = Humanoid.WalkSpeed,
     Min = Humanoid.WalkSpeed,
     Max = 300,
@@ -114,6 +119,7 @@ local walkSpeedSlider = walkSpeed:AddSlider("WalkSpeedSlider", {
 })
 
 local jumpPowerSlider = jumpPower:AddSlider("JumpPowerSlider", {
+    Text = "Jump Power",
     Default = Humanoid.UseJumpPower and Humanoid.JumpPower or Humanoid.JumpHeight,
     Min = Humanoid.UseJumpPower and Humanoid.JumpPower or Humanoid.JumpHeight,
     Max = 300,
@@ -121,6 +127,7 @@ local jumpPowerSlider = jumpPower:AddSlider("JumpPowerSlider", {
 })
 
 local fovSlider = fov:AddSlider("FOVSlider", {
+    Text = "FOV",
     Default = workspace.CurrentCamera.FieldOfView,
     Max = 120,
     Rounding = 1
@@ -340,9 +347,7 @@ local function updateJumpPower(power)
     end
 end
 
-local function setupWalkSpeed(speed)
-    if not Toggles.walkSpeedToggle then return end
-        
+local function setupWalkSpeed(speed)        
     disconnectConnections(HumanoidConnections.WalkSpeed)
     updateWalkSpeed(speed)
 
@@ -351,9 +356,7 @@ local function setupWalkSpeed(speed)
     end))
 end
 
-local function setupJumpPower(power)
-    if not Toggles.jumpPowerToggle then return end
-    
+local function setupJumpPower(power)    
     disconnectConnections(HumanoidConnections.JumpPower)
     updateJumpPower(power)
 
@@ -364,6 +367,32 @@ local function setupJumpPower(power)
     end))
 end
 
+walkSpeedToggle:OnChanged(function(enabled)
+    if enabled then
+        setupWalkSpeed(Options.WalkSpeedSlider.Value)
+    else
+        disconnectConnections(HumanoidConnections.WalkSpeed)
+        updateWalkSpeed(originalWalkSpeed)
+    end
+end)
+
+jumpPowerToggle:OnChanged(function(enabled)
+    if enabled then
+        setupJumpPower(Options.JumpPowerSlider.Value)
+    else
+        disconnectConnections(HumanoidConnections.JumpPower)
+        updateJumpPower(originalJumpValue)
+    end
+end)
+
+fovToggle:OnChanged(function(enabled)
+    if enabled then
+        workspace.CurrentCamera.FieldOfView = Options.FOVSlider.Value
+    else
+        workspace.CurrentCamera.FieldOfView = originalFOV
+    end
+end)
+
 walkSpeedSlider:OnChanged(function(value)
     setupWalkSpeed(value)
 end)
@@ -373,8 +402,6 @@ jumpPowerSlider:OnChanged(function(value)
 end)
 
 fovSlider:OnChanged(function(value)
-    if not Toggles.fovToggle then return end
-    
     workspace.CurrentCamera.FieldOfView = value
 end)
 
