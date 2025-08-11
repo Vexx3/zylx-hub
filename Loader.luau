@@ -1,4 +1,5 @@
 local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
 
 local Player = Players.LocalPlayer
 
@@ -9,6 +10,12 @@ local HumanoidConnections = {
     WalkSpeed = {},
     JumpPower = {}
 }
+
+local noclipping = nil
+local clip = true
+
+local infJumpConnection
+local infJumpDebounce = false
 
 local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
 local Library = loadstring(game:HttpGet(`{repo}Library.lua`))()
@@ -31,8 +38,8 @@ local Tabs = {
 }
 
 local Groupboxes = {
-    Movement = Tabs.Player:AddLeftGroupbox("Movement"),
-    Visual = Tabs.Player:AddLeftGroupbox("Visual")
+    Movement = Tabs.Player:AddLeftGroupbox("Movement", "user-round-plus"),
+    Visual = Tabs.Player:AddRightGroupbox("Visual", "eye")
 }
 
 local walkSpeed = Groupboxes.Movement:AddSlider("WalkSpeedSlider", {
@@ -49,6 +56,16 @@ local jumpPower = Groupboxes.Movement:AddSlider("JumpPowerSlider", {
     Min = Humanoid.UseJumpPower and Humanoid.JumpPower or Humanoid.JumpHeight,
     Rounding = 1,
     Tooltip = "Change your jump power"
+})
+
+local noclip = Groupboxes.Movement:AddToggle("Noclip", {
+    Text = "Noclip",
+    Tooltip = "Allows you to go through objects"
+})
+
+local infJump = Groupboxes.Movement:AddToggle("InfJump", {
+    Text = "Infinite Jump",
+    Tooltip = "Allows you to jump multiple times before hitting the ground"
 })
 
 local function disconnectConnections(list)
@@ -87,7 +104,9 @@ local function setupJumpPower(power)
     disconnectConnections(HumanoidConnections.JumpPower)
     updateJumpPower(power)
 
-    table.insert(HumanoidConnections.JumpPower, Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+    local typeOfJump = Humanoid.UseJumpPower and "JumpPower" or "JumpHeight" 
+
+    table.insert(HumanoidConnections.JumpPower, Humanoid:GetPropertyChangedSignal(typeOfJump):Connect(function()
         updateJumpPower(power)
     end))
 end
@@ -100,11 +119,61 @@ jumpPower:OnChanged(function(value)
     setupJumpPower(value)
 end)
 
+noclip:OnChanged(function(enabled)
+    if noclipping then
+        noclipping:Disconnect()
+        noclipping = nil
+    end
+
+    if not enabled then return end
+
+    --[[
+    local function noclipLoop()
+        if clip == false and Character ~= nil then
+            for _, child in Character:GetDescendants() do
+                if child:IsA("BasePart") and child.CanCollide == true then
+                    child.CanCollide = false
+                end
+            end
+        end
+    end
+    ]]
+
+    noclipping = RunService.Stepped:Connect(function()
+        if not Character then return end
+        for _, child in Character:GetDescendants() do
+            if child:IsA("BasePart") then
+                child.CanCollide = false
+            end
+        end
+    end)
+end)
+
+infJump:OnChanged(function(enabled)
+    if not enabled then return end
+
+    if infJumpConnection then
+        infJumpConnection:Disconnect()
+        infJumpConnection = nil
+    end
+
+    infJumpDebounce = false
+
+    infJumpConnection = UserInputService.JumpRequest:Connect(function()
+        if infJumpDebounce then return end
+        infJumpDebounce = true
+        Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        task.wait()
+        infJumpDebounce = false
+    end)
+end)
+
 Player.CharacterAdded:Connect(function(character)
+    Character = character
     Humanoid = character:WaitForChild("Humanoid")
 
     setupWalkSpeed(Options.WalkSpeedSlider.Value)
-    setupJumpPower(Options.JumpPower.Value)
+    setupJumpPower(Options.JumpPowerSlider.Value)
 end)
 
 ThemeManager:SetLibrary(Library)
