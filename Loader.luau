@@ -604,6 +604,10 @@ antiMod:OnChanged(function(enabled)
             Description = "Game is not owned by a group",
             Time = 10
         })
+
+        antiMod:SetValue(false)
+        antiMod:Disabled(true)
+        antiMod.DisabledTooltip = "Game is not owned by a group"
     end
 end)
 
