@@ -29,6 +29,9 @@ local infJumpDebounce = false
 
 local brightLoop
 
+local antiAfkConnection
+local disabledRobloxConnections = {}
+
 local function rejoin()
     if #Players:GetPlayers() <= 1 then
         Player:Kick("\nRejoining...")
@@ -342,14 +345,24 @@ antiAfk:OnChanged(function(enabled)
         antiAfkConnection = nil
     end
 
+    if #disabledRobloxConnections > 0 then
+        for _, connection in disabledRobloxConnections do
+            if connection.Enable then
+                connection:Enable()
+            end
+        end
+        table.clear(disabledRobloxConnections)
+    end
+
     if not enabled then return end
 
     local getcon = getconnections
     if getcon then
         for _, connection in getcon(Player.Idled) do
-            if connection["Disable"] then
+            if connection.Disable then
                 connection:Disable()
-            elseif connection["Disconnect"] then
+                table.insert(disabledRobloxConnections, connection)
+            elseif connection.Disconnect then
                 connection:Disconnect()
             end
         end
