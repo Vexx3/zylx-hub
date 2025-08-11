@@ -59,7 +59,7 @@ local Window = Library:CreateWindow({
 local Tabs = {
     Main = Window:AddTab("Main", "house", "Core features and primary functions"),
     Misc = Window:AddTab("Misc", "shuffle", "Extra tools and miscellaneous features"),
-    Player = Window:AddTab("Player", "user", "Customization and settings for your player")
+    Player = Window:AddTab("Player", "user", "Customization and settings for your player"),
 }
 
 local Groupboxes = {
@@ -195,7 +195,7 @@ local rejoinButton = Groupboxes.PlayerOthers:AddButton("Rejoin", {
 
 local serverHop = Groupboxes.PlayerOthers:AddButton("ServerHop", {
     Text = "Server Hop",
-    Tooltip = "Teleports you to a different server"
+    Tooltip = "Teleports you to a different server",
     Func = function()
         -- credits for IY
         local servers = {}
@@ -375,7 +375,7 @@ antiAfk:OnChanged(function(enabled)
 end)
 
 autoRejoin:OnChanged(function(enabled)
-    GuiService.ErrorMessageChanged(function()
+    GuiService.ErrorMessageChanged:Connect(function()
         rejoin()
     end)
 end)
