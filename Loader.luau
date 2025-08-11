@@ -607,10 +607,6 @@ antiMod:OnChanged(function(enabled)
     end
 end)
 
-actionMod:OnChanged(function(value)
-    print(`Action Mod: {value}`)
-end)
-
 Player.CharacterAdded:Connect(function(character)
     Character = character
     Humanoid = character:WaitForChild("Humanoid")
