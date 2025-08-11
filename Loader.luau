@@ -584,7 +584,7 @@ antiMod:OnChanged(function(enabled)
         staffWatchJoin = Players.PlayerAdded:Connect(function(player)
             local result = getStaffRole(player)
             if result.Staff then
-                -- the action which is kick / notify / shutdown
+                doStaffAction(Options.ActionMod.Value, found)
             end
         end)
         
@@ -608,16 +608,6 @@ antiMod:OnChanged(function(enabled)
 
         antiMod:SetValue(false)
         antiMod:Disabled(true)
-    end
-end)
-
-task.defer(function()
-    for _, toggle in Toggles do
-        if toggle.Value and type(toggle.Callback) == "function" then
-            task.spawn(function()
-                toggle.Callback(true)
-            end)
-        end
     end
 end)
 
