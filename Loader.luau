@@ -311,6 +311,7 @@ local antiMod = Groupboxes.Safety:AddToggle("AntiMod", {
     Text = "Anti Mod",
     Default = true,
     Tooltip = "Checks if a staff member of the game joins the server then do the action",
+    DisabledTooltip = "Game is not owned by a group"
 })
 
 local actionMod = Groupboxes.Safety:AddDropdown("ActionMod", {
@@ -607,7 +608,6 @@ antiMod:OnChanged(function(enabled)
 
         antiMod:SetValue(false)
         antiMod:Disabled(true)
-        antiMod.DisabledTooltip = "Game is not owned by a group"
     end
 end)
 
