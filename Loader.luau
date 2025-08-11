@@ -75,30 +75,55 @@ local Groupboxes = {
     UISettingsGroup = Tabs.UISettings:AddLeftGroupbox("Menu", "wrench"),
 }
 
-local walkSpeed = Groupboxes.General:AddSlider("WalkSpeedSlider", {
+local walkSpeed = Groupboxes.General:AddDependencyBox()
+local jumpPower = Groupboxes.General:AddDependencyBox()
+local fov = Groupboxes.General:AddDependencyBox()
+
+local walkSpeedToggle = Groupboxes.General:AddToggle("walkSpeedToggle", {
+    Text = "Change your walkspeed"
+})
+
+local jumpPowerToggle = Groupboxes.General:AddToggle("jumpPowerToggle", {
+    Text = "Change your jump power"
+})
+
+local fovToggle = Groupboxes.General:AddToggle("fovToggle", {
+    Text = "Adjusts field of view"
+})
+
+walkSpeed:SetupDependencies({
+    { Toggles.walkSpeedToggle, true }
+})
+
+jumpPower:SetupDependencies({
+    { Toggles.jumpPowerToggle, true }
+})
+
+fov:SetupDependencies({
+    { Toggles.fovToggle, true }
+})
+
+local walkSpeedSlider = walkSpeed:AddSlider("WalkSpeedSlider", {
     Text = "WalkSpeed",
     Default = Humanoid.WalkSpeed,
     Min = Humanoid.WalkSpeed,
     Max = 300,
-    Rounding = 1,
-    Tooltip = "Change your walkspeed"
+    Rounding = 1
 })
 
-local jumpPower = Groupboxes.General:AddSlider("JumpPowerSlider", {
+local jumpPowerSlider = jumpPower:AddSlider("JumpPowerSlider", {
     Text = "Jump Power",
     Default = Humanoid.UseJumpPower and Humanoid.JumpPower or Humanoid.JumpHeight,
     Min = Humanoid.UseJumpPower and Humanoid.JumpPower or Humanoid.JumpHeight,
     Max = 300,
-    Rounding = 1,
-    Tooltip = "Change your jump power"
+    Rounding = 1
 })
 
-local fov = Groupboxes.General:AddSlider("FOVSlider", {
-    Text = "Field Of View",
+local fovSlider = fov:AddSlider("FOVSlider", {
+    Text = "FOV",
     Default = workspace.CurrentCamera.FieldOfView,
     Max = 120,
-    Rounding = 1,
-    Tooltip = "Adjusts field of view"
+    Rounding = 1
 })
 
 local noclip = Groupboxes.General:AddToggle("Noclip", {
@@ -316,6 +341,8 @@ local function updateJumpPower(power)
 end
 
 local function setupWalkSpeed(speed)
+    if not Toggles.walkSpeedToggle then return end
+        
     disconnectConnections(HumanoidConnections.WalkSpeed)
     updateWalkSpeed(speed)
 
@@ -325,6 +352,8 @@ local function setupWalkSpeed(speed)
 end
 
 local function setupJumpPower(power)
+    if not Toggles.jumpPowerToggle then return end
+    
     disconnectConnections(HumanoidConnections.JumpPower)
     updateJumpPower(power)
 
@@ -344,6 +373,8 @@ jumpPower:OnChanged(function(value)
 end)
 
 fov:OnChanged(function(value)
+    if not Toggles.fovToggle then return end
+    
     workspace.CurrentCamera.FieldOfView = value
 end)
 
