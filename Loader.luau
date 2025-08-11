@@ -578,28 +578,7 @@ antiMod:OnChanged(function(enabled)
 
     if not enabled then return end
 
-    if game.CreatorType == Enum.CreatorType.Group then
-        local found = {}
-
-        staffWatchJoin = Players.PlayerAdded:Connect(function(player)
-            local result = getStaffRole(player)
-            if result.Staff then
-                doStaffAction(Options.ActionMod.Value, found)
-            end
-        end)
-        
-        for _, player in Players:GetPlayers() do
-            local result = getStaffRole(player)
-            if result.Staff then
-                table.insert(found, `{formatUsername} is a {result.Role}`)
-                doStaffAction(Options.ActionMod.Value, found)
-            end
-        end
-
-        if #found > 0 then
-            doStaffAction(Options.ActionMod.Value, found)
-        end
-    else
+    if not game.CreatorType ~= Enum.CreatorType.Group then
         Library:Notify({
             Title = "Anti Mod",
             Description = "Game is not owned by a group",
@@ -608,6 +587,28 @@ antiMod:OnChanged(function(enabled)
 
         antiMod:SetValue(false)
         antiMod:Disabled(true)
+        return
+    end
+
+    local found = {}
+
+    staffWatchJoin = Players.PlayerAdded:Connect(function(player)
+        local result = getStaffRole(player)
+        if result.Staff then
+            doStaffAction(Options.ActionMod.Value, found)
+        end
+    end)
+        
+    for _, player in Players:GetPlayers() do
+        local result = getStaffRole(player)
+        if result.Staff then
+            table.insert(found, `{formatUsername} is a {result.Role}`)
+            doStaffAction(Options.ActionMod.Value, found)
+        end
+    end
+
+    if #found > 0 then
+        doStaffAction(Options.ActionMod.Value, found)
     end
 end)
 
