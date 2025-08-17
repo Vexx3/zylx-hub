@@ -8,9 +8,7 @@ local TeleportService = game:GetService("TeleportService")
 local UserInputService = game:GetService("UserInputService")
 local VirtualUser = game:GetService("VirtualUser")
 
-print("hi")
---local Janitor = loadstring(game:HttpGet("https://raw.githubusercontent.com/howmanysmall/Janitor/refs/heads/main/src/init.luau"))()
-print("loaded")
+local Janitor = loadstring(game:HttpGet("https://raw.githubusercontent.com/howmanysmall/Janitor/refs/heads/main/src/init.luau"))()
 
 local disabledRobloxConnections: { RBXScriptConnection } = {}
 
