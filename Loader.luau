@@ -61,9 +61,7 @@ local infJumpDebounce = false
 
 local function removeConnection(connectionName: keyof<ConnectionsType>)
     local connection = connections[connectionName]
-    print(connection)
-    if connection then
-        print(connection)
+    if connection ~= nil then
         connection:Disconnect()
         connections[connectionName] = nil
     end
