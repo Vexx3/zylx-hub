@@ -61,6 +61,7 @@ local infJumpDebounce = false
 
 local function removeConnection(connectionName: keyof<Connections>)
     local connection = connections[connectionName]
+    print(connection)
     if connection then
         print(connection)
         connection:Disconnect()
