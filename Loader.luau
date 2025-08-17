@@ -8,7 +8,7 @@ local TeleportService = game:GetService("TeleportService")
 local UserInputService = game:GetService("UserInputService")
 local VirtualUser = cloneref(game:GetService("VirtualUser"))
 
-type Connections = {
+type ConnectionsType = {
     brightLoop: RBXScriptConnection?,
     noclipping: RBXScriptConnection?,
     antiAfkConnection: RBXScriptConnection?,
@@ -28,7 +28,7 @@ local HumanoidConnections: HumanoidConnectionTable = {
     JumpPower = {}
 }
 
-local connections: Connections = {
+local Connections: ConnectionsType = {
     brightLoop = nil,
     noclipping = nil,
     antiAfkConnection = nil,
@@ -59,7 +59,7 @@ local JobId = game.JobId
 
 local infJumpDebounce = false
 
-local function removeConnection(connectionName: keyof<Connections>)
+local function removeConnection(connectionName: keyof<ConnectionsType>)
     local connection = connections[connectionName]
     print(connection)
     if connection then
@@ -478,7 +478,7 @@ noclip:OnChanged(function(enabled)
     if not enabled then return end
     if not Character then return end
 
-    noclipping = RunService.Stepped:Connect(function()
+    Connections.noclipping = RunService.Stepped:Connect(function()
         for _, child in Character:GetDescendants() do
             if child:IsA("BasePart") and child.CanCollide == true then
                 child.CanCollide = false
@@ -494,7 +494,7 @@ infJump:OnChanged(function(enabled)
 
     infJumpDebounce = false
 
-    infJumpConnection = UserInputService.JumpRequest:Connect(function()
+    Connections.infJumpConnection = UserInputService.JumpRequest:Connect(function()
         if infJumpDebounce then return end
         infJumpDebounce = true
         Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
@@ -509,7 +509,7 @@ instantPrompt:OnChanged(function(enabled)
     if not enabled then return end
 
     if fireproximityprompt then
-        promptButtonHoldBegan = ProximityPromptService.PromptButtonHoldBegan:Connect(function(prompt)
+        Connections.promptButtonHoldBegan = ProximityPromptService.PromptButtonHoldBegan:Connect(function(prompt)
             fireproximityprompt(prompt)
         end)
     else
@@ -526,7 +526,7 @@ fullBright:OnChanged(function(enabled)
 
     if not enabled then return end
 
-    brightLoop = RunService.RenderStepped:Connect(function()
+    Connections.brightLoop = RunService.RenderStepped:Connect(function()
         Lighting.Brightness = 2
         Lighting.ClockTime = 14
         Lighting.FogEnd = 100000
@@ -568,7 +568,7 @@ local function setupAntiAfk(enabled: boolean)
             end
         end
     else
-        antiAfkConnection = Player.Idled:Connect(function()
+        Connections.antiAfkConnection = Player.Idled:Connect(function()
             VirtualUser:CaptureController()
             VirtualUser:ClickButton(Vector2.new())
         end)
@@ -580,7 +580,7 @@ local function setupAutoRejoin(enabled: boolean)
 
     if not enabled then return end
     
-    autoRejoinConnection = GuiService.ErrorMessageChanged:Connect(function()
+    Connections.autoRejoinConnection = GuiService.ErrorMessageChanged:Connect(function()
         rejoin()
     end)
 end
@@ -598,7 +598,7 @@ local function setupAutoMod(enabled: boolean)
 
     local found: {string} = {}
 
-    staffWatchJoin = Players.PlayerAdded:Connect(function(player)
+    Connections.staffWatchJoin = Players.PlayerAdded:Connect(function(player)
         local result = getStaffRole(player)
         if result.Staff then
             doStaffAction(Options.ActionMod.Value, found)
