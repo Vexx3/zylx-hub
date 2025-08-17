@@ -178,7 +178,7 @@ fov:SetupDependencies({
 })
 
 local walkSpeedSlider = walkSpeed:AddSlider("WalkSpeedSlider", {
-    Text = "",
+    Text = "WalkSpeed",
     Default = Humanoid.WalkSpeed,
     Min = Humanoid.WalkSpeed,
     Max = 300
