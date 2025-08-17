@@ -1,4 +1,4 @@
-local repo = "https://raw.githubusercontent.com/Vexx3/zylx-hub/refs/heads/main/scripts/"
+local repo = "https://github.com/Vexx3/zylx-hub/tree/main/src/scripts"
 
 local supportedGames = {
 	-- [17574618959] = true,
