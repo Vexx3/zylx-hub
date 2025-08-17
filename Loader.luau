@@ -51,7 +51,7 @@ local Character = Player.Character or Player.CharacterAdded:Wait()
 local Humanoid = Character:FindFirstChildWhichIsA("Humanoid")
 
 local originalWalkSpeed = Humanoid.WalkSpeed
-local originalJumpValue = Humanoid.UseJumpPower and Humanoid.JumpPower or Humanoid.JumpHeight
+local originalJumpValue = if Humanoid.UseJumpPower then Humanoid.JumpPower else Humanoid.JumpHeight
 local originalFOV = workspace.CurrentCamera.FieldOfView
 
 local PlaceId = game.PlaceId
