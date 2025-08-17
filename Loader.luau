@@ -587,8 +587,8 @@ local function setupAutoMod(enabled: boolean)
     if not enabled then return end
 
     if game.CreatorType ~= Enum.CreatorType.Group then
-        antiMod:SetValue(false)
-        antiMod:Disabled(true)
+        Toggles.AntiMod:SetValue(false)
+        Toggles.AntiMod:Disabled(true)
         return
     end
 
