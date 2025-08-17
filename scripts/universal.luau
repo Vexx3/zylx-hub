@@ -59,6 +59,16 @@ local JobId = game.JobId
 
 local infJumpDebounce = false
 
+local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
+local Library = assert(loadstring(game:HttpGet(`{repo}Library.lua`)))()
+local ThemeManager = assert(loadstring(game:HttpGet(`{repo}addons/ThemeManager.lua`)))()
+local SaveManager = assert(loadstring(game:HttpGet(`{repo}addons/SaveManager.lua`)))()
+
+local Options = Library.Options
+local Toggles = Library.Toggles
+
+Library.NotifyOnError = true
+
 local function removeConnection(connectionName: keyof<ConnectionsType>)
     local connection = Connections[connectionName]
     if connection then
@@ -112,16 +122,6 @@ local function doStaffAction(action: "Kick" | "Shutdown" | "Notify", staffList: 
         })
     end
 end
-
-local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
-local Library = loadstring(game:HttpGet(`{repo}Library.lua`))()
-local ThemeManager = loadstring(game:HttpGet(`{repo}addons/ThemeManager.lua`))()
-local SaveManager = loadstring(game:HttpGet(`{repo}addons/SaveManager.lua`))()
-
-local Options = Library.Options
-local Toggles = Library.Toggles
-
-Library.NotifyOnError = true
 
 local Window = Library:CreateWindow({
     Title = "Zylx Hub",
@@ -222,7 +222,7 @@ local noRender = Groupboxes.Game:AddToggle("NoRender", {
     Tooltip = "Disable 3d rendering to decrease the amount of CPU the client uses"
 })
 
-local lowGraphics = Groupboxes.Game:AddButton("LowGraphics", {
+Groupboxes.Game:AddButton("LowGraphics", {
     Text = "Low Graphics",
     Tooltip = "Lowers game quality to boost FPS",
     Func = function()
@@ -234,7 +234,7 @@ local lowGraphics = Groupboxes.Game:AddButton("LowGraphics", {
     	Lighting.FogEnd = 9e9
     	Lighting.FogStart = 9e9
         
-        settings().Rendering.QualityLevel = 1
+        settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
         
         for _, instance in game:GetDescendants() do
             if instance:IsA("BasePart") then
@@ -270,7 +270,7 @@ local lowGraphics = Groupboxes.Game:AddButton("LowGraphics", {
     end
 })
 
-local noFog = Groupboxes.Game:AddButton("NoFog", {
+Groupboxes.Game:AddButton("NoFog", {
     Text = "No Fog",
     Tooltip = "Removes fog",
     Func = function()
@@ -296,13 +296,13 @@ local autoRejoin = Groupboxes.Server:AddToggle("AutoRejoin", {
     Tooltip = "Auto rejoins the server if you get kicked/disconnected"
 })
 
-local rejoinButton = Groupboxes.Server:AddButton("Rejoin", {
+Groupboxes.Server:AddButton("Rejoin", {
     Text = "Rejoin",
     Tooltip = "Rejoins the game",
     Func = rejoin
 })
 
-local serverHop = Groupboxes.Server:AddButton("ServerHop", {
+Groupboxes.Server:AddButton("ServerHop", {
     Text = "Server Hop",
     Tooltip = "Teleports you to a different server",
     Func = function()
@@ -338,7 +338,7 @@ local antiMod = Groupboxes.Safety:AddToggle("AntiMod", {
     DisabledTooltip = "Game is not owned by a group"
 })
 
-local actionMod = Groupboxes.Safety:AddDropdown("ActionMod", {
+Groupboxes.Safety:AddDropdown("ActionMod", {
     Values = {"Shutdown", "Kick", "Notify"},
     Default = "Kick",
     Tooltip = "Action to do if the staff is in the game",
