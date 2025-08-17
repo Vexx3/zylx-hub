@@ -5,7 +5,7 @@ local supportedGames = {
 }
 
 if supportedGames[game.GameId] then
-	assert(loadstring(`{repo}{game.GameId}.luau`))()
+	loadstring(`{repo}{game.GameId}.luau`)()
 else
-	assert(loadstring(`{repo}universal.luau`))()
+	loadstring(`{repo}universal.luau`)()
 end

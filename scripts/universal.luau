@@ -9,9 +9,8 @@ local UserInputService = game:GetService("UserInputService")
 local VirtualUser = game:GetService("VirtualUser")
 
 print("hi")
-local Janitor = assert(
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/howmanysmall/Janitor/refs/heads/main/src/init.luau"))
-)()
+local Janitor =
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/howmanysmall/Janitor/refs/heads/main/src/init.luau"))()
 print("loaded")
 
 local disabledRobloxConnections: { RBXScriptConnection } = {}
@@ -37,9 +36,9 @@ local JobId = game.JobId
 local infJumpDebounce = false
 
 local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
-local Library = assert(loadstring(game:HttpGet(`{repo}Library.lua`)))()
-local ThemeManager = assert(loadstring(game:HttpGet(`{repo}addons/ThemeManager.lua`)))()
-local SaveManager = assert(loadstring(game:HttpGet(`{repo}addons/SaveManager.lua`)))()
+local Library = loadstring(game:HttpGet(`{repo}Library.lua`))()
+local ThemeManager = loadstring(game:HttpGet(`{repo}addons/ThemeManager.lua`))()
+local SaveManager = loadstring(game:HttpGet(`{repo}addons/SaveManager.lua`))()
 
 local Options = Library.Options
 local Toggles = Library.Toggles
@@ -466,17 +465,17 @@ noclip:OnChanged(function(enabled)
 		return
 	end
 
-    Janitor:Add(
-        RunService.Stepped:Connect(function()
-            for _, child in Character:GetDescendants() do
-                if child:IsA("BasePart") and child.CanCollide == true then
-                    child.CanCollide = false
-                end
-            end
-        end),
-        "Disconnect",
-        "Noclipping"
-    )
+	Janitor:Add(
+		RunService.Stepped:Connect(function()
+			for _, child in Character:GetDescendants() do
+				if child:IsA("BasePart") and child.CanCollide == true then
+					child.CanCollide = false
+				end
+			end
+		end),
+		"Disconnect",
+		"Noclipping"
+	)
 end)
 
 infJump:OnChanged(function(enabled)
@@ -488,20 +487,20 @@ infJump:OnChanged(function(enabled)
 
 	infJumpDebounce = false
 
-    Janitor:Add(
-        UserInputService.JumpRequest:Connect(function()
-            if infJumpDebounce then
-                return
-            end
+	Janitor:Add(
+		UserInputService.JumpRequest:Connect(function()
+			if infJumpDebounce then
+				return
+			end
 
-            infJumpDebounce = true
-            Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-            task.wait()
-            infJumpDebounce = false
-        end),
-        "Disconnect",
-        "InfJump"
-    )
+			infJumpDebounce = true
+			Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+			task.wait()
+			infJumpDebounce = false
+		end),
+		"Disconnect",
+		"InfJump"
+	)
 end)
 
 instantPrompt:OnChanged(function(enabled)
@@ -512,13 +511,13 @@ instantPrompt:OnChanged(function(enabled)
 	end
 
 	if fireproximityprompt then
-        Janitor:Add(
-            ProximityPromptService.PromptButtonHoldBegan:Connect(function(prompt)
-                fireproximityprompt(prompt)
-            end),
-            "Disconnect",
-            "InstantProximity"
-        )
+		Janitor:Add(
+			ProximityPromptService.PromptButtonHoldBegan:Connect(function(prompt)
+				fireproximityprompt(prompt)
+			end),
+			"Disconnect",
+			"InstantProximity"
+		)
 	else
 		Library:Notify({
 			Title = "Incompatible Exploit",
@@ -535,17 +534,17 @@ fullBright:OnChanged(function(enabled)
 		return
 	end
 
-    Janitor:Add(
-        RunService.RenderStepped:Connect(function()
-            Lighting.Brightness = 2
-            Lighting.ClockTime = 14
-            Lighting.FogEnd = 100000
-            Lighting.GlobalShadows = false
-            Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
-        end),
-        "Disconnect",
-        "BrightLoop"
-    )
+	Janitor:Add(
+		RunService.RenderStepped:Connect(function()
+			Lighting.Brightness = 2
+			Lighting.ClockTime = 14
+			Lighting.FogEnd = 100000
+			Lighting.GlobalShadows = false
+			Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
+		end),
+		"Disconnect",
+		"BrightLoop"
+	)
 end)
 
 noRender:OnChanged(function(enabled)
@@ -584,13 +583,13 @@ local function setupAntiAfk(enabled: boolean)
 		end
 	else
 		Janitor:Add(
-            Player.Idled:Connect(function()
-			    VirtualUser:CaptureController()
-			    VirtualUser:ClickButton(Vector2.new())
-		    end),
-            "Disconnect",
-            "AntiAfk"
-        )
+			Player.Idled:Connect(function()
+				VirtualUser:CaptureController()
+				VirtualUser:ClickButton(Vector2.new())
+			end),
+			"Disconnect",
+			"AntiAfk"
+		)
 	end
 end
 
@@ -602,16 +601,16 @@ local function setupAutoRejoin(enabled: boolean)
 	end
 
 	Janitor:Add(
-        GuiService.ErrorMessageChanged:Connect(function()
-		    rejoin()
-	    end),
-        "Disconnect",
-        "AutoRejoin"
-    )
+		GuiService.ErrorMessageChanged:Connect(function()
+			rejoin()
+		end),
+		"Disconnect",
+		"AutoRejoin"
+	)
 end
 
 local function setupAutoMod(enabled: boolean)
-    Janitor:Remove("StaffWatchJoin")
+	Janitor:Remove("StaffWatchJoin")
 
 	if not enabled then
 		return
@@ -626,15 +625,15 @@ local function setupAutoMod(enabled: boolean)
 	local found = {}
 
 	Janitor:Add(
-        Players.PlayerAdded:Connect(function(player)
-		    local result = getStaffRole(player)
-		    if result.Staff then
-			    doStaffAction(Options.ActionMod.Value, found)
-		    end
-	    end),
-        "Disconnect",
-        "StaffWatchJoin"
-    )
+		Players.PlayerAdded:Connect(function(player)
+			local result = getStaffRole(player)
+			if result.Staff then
+				doStaffAction(Options.ActionMod.Value, found)
+			end
+		end),
+		"Disconnect",
+		"StaffWatchJoin"
+	)
 
 	for _, player in Players:GetPlayers() do
 		local result = getStaffRole(player)
