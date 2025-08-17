@@ -5,7 +5,9 @@ local supportedGames = {
 }
 
 if supportedGames[game.GameId] then
+	print("supported game loading")
 	loadstring(`{repo}{game.GameId}.luau`)()
 else
+	print("loading universal")
 	loadstring(`{repo}universal.luau`)()
 end
