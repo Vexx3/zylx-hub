@@ -461,7 +461,6 @@ noclip:OnChanged(function(enabled)
 	end
 
 	maid["Noclipping"] = RunService.Stepped:Connect(function()
-        print("noclip!!")
 		for _, child in Character:GetDescendants() do
 			if child:IsA("BasePart") and child.CanCollide == true then
 				child.CanCollide = false
