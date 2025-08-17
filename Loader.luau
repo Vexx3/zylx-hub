@@ -60,8 +60,8 @@ local JobId = game.JobId
 local infJumpDebounce = false
 
 local function removeConnection(connectionName: keyof<ConnectionsType>)
-    local connection = connections[connectionName]
-    if connection ~= nil then
+    local connection = Connections[connectionName]
+    if connection then
         connection:Disconnect()
         connections[connectionName] = nil
     end
