@@ -8,35 +8,9 @@ local TeleportService = game:GetService("TeleportService")
 local UserInputService = game:GetService("UserInputService")
 local VirtualUser = game:GetService("VirtualUser")
 
-type ConnectionsType = {
-	brightLoop: RBXScriptConnection?,
-	noclipping: RBXScriptConnection?,
-	antiAfkConnection: RBXScriptConnection?,
-	autoRejoinConnection: RBXScriptConnection?,
-	infJumpConnection: RBXScriptConnection?,
-	promptButtonHoldBegan: RBXScriptConnection?,
-	staffWatchJoin: RBXScriptConnection?,
-}
-
-type HumanoidConnectionTable = {
-	WalkSpeed: { RBXScriptConnection },
-	JumpPower: { RBXScriptConnection },
-}
-
-local HumanoidConnections: HumanoidConnectionTable = {
-	WalkSpeed = {},
-	JumpPower = {},
-}
-
-local Connections: ConnectionsType = {
-	brightLoop = nil,
-	noclipping = nil,
-	antiAfkConnection = nil,
-	autoRejoinConnection = nil,
-	infJumpConnection = nil,
-	promptButtonHoldBegan = nil,
-	staffWatchJoin = nil,
-}
+local Janitor = assert(
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/howmanysmall/Janitor/refs/heads/main/src/init.luau"))
+)()
 
 local disabledRobloxConnections: { RBXScriptConnection } = {}
 
@@ -69,14 +43,6 @@ local Options = Library.Options
 local Toggles = Library.Toggles
 
 Library.NotifyOnError = true
-
-local function removeConnection(connectionName: keyof<ConnectionsType>)
-	local connection = Connections[connectionName]
-	if connection then
-		connection:Disconnect()
-		Connections[connectionName] = nil
-	end
-end
 
 local function rejoin()
 	if #Players:GetPlayers() <= 1 then
@@ -187,8 +153,8 @@ local walkSpeedSlider = walkSpeed:AddSlider("WalkSpeedSlider", {
 
 local jumpPowerSlider = jumpPower:AddSlider("JumpPowerSlider", {
 	Text = "Jump Power",
-	Default = Humanoid.UseJumpPower and Humanoid.JumpPower or Humanoid.JumpHeight,
-	Min = Humanoid.UseJumpPower and Humanoid.JumpPower or Humanoid.JumpHeight,
+	Default = if Humanoid.UseJumpPower then Humanoid.JumpPower else Humanoid.JumpHeight,
+	Min = if Humanoid.UseJumpPower then Humanoid.JumpPower else Humanoid.JumpHeight,
 	Max = 300,
 })
 
@@ -405,13 +371,6 @@ Groupboxes.UISettingsGroup:AddButton("Unload", function()
 	Library:Unload()
 end)
 
-local function disconnectConnections(list: { RBXScriptConnection })
-	for _, connection in list do
-		connection:Disconnect()
-	end
-	table.clear(list)
-end
-
 local function updateWalkSpeed(speed: number)
 	if Humanoid then
 		Humanoid.WalkSpeed = speed
@@ -429,28 +388,30 @@ local function updateJumpPower(power: number)
 end
 
 local function setupWalkSpeed(speed: number)
-	disconnectConnections(HumanoidConnections.WalkSpeed)
+	Janitor:Remove("WalkSpeed")
 	updateWalkSpeed(speed)
 
-	table.insert(
-		HumanoidConnections.WalkSpeed,
+	Janitor:Add(
 		Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
 			updateWalkSpeed(speed)
-		end)
+		end),
+		"Disconnect",
+		"WalkSpeed"
 	)
 end
 
 local function setupJumpPower(power: number)
-	disconnectConnections(HumanoidConnections.JumpPower)
+	Janitor:Remove("JumpPower")
 	updateJumpPower(power)
 
 	local typeOfJump = if Humanoid.UseJumpPower then "JumpPower" else "JumpHeight"
 
-	table.insert(
-		HumanoidConnections.JumpPower,
+	Janitor:Add(
 		Humanoid:GetPropertyChangedSignal(typeOfJump):Connect(function()
 			updateJumpPower(power)
-		end)
+		end),
+		"Disconnect",
+		"JumpPower"
 	)
 end
 
@@ -458,7 +419,7 @@ walkSpeedToggle:OnChanged(function(enabled)
 	if enabled then
 		setupWalkSpeed(Options.WalkSpeedSlider.Value)
 	else
-		disconnectConnections(HumanoidConnections.WalkSpeed)
+		Janitor:Remove("WalkSpeed")
 		updateWalkSpeed(originalWalkSpeed)
 	end
 end)
@@ -467,7 +428,7 @@ jumpPowerToggle:OnChanged(function(enabled)
 	if enabled then
 		setupJumpPower(Options.JumpPowerSlider.Value)
 	else
-		disconnectConnections(HumanoidConnections.JumpPower)
+		Janitor:Remove("JumpPower")
 		updateJumpPower(originalJumpValue)
 	end
 end)
@@ -493,7 +454,7 @@ fovSlider:OnChanged(function(value)
 end)
 
 noclip:OnChanged(function(enabled)
-	removeConnection("noclipping")
+	Janitor:Remove("Noclipping")
 
 	if not enabled then
 		return
@@ -503,17 +464,21 @@ noclip:OnChanged(function(enabled)
 		return
 	end
 
-	Connections.noclipping = RunService.Stepped:Connect(function()
-		for _, child in Character:GetDescendants() do
-			if child:IsA("BasePart") and child.CanCollide == true then
-				child.CanCollide = false
-			end
-		end
-	end)
+    Janitor:Add(
+        RunService.Stepped:Connect(function()
+            for _, child in Character:GetDescendants() do
+                if child:IsA("BasePart") and child.CanCollide == true then
+                    child.CanCollide = false
+                end
+            end
+        end),
+        "Disconnect",
+        "Noclipping"
+    )
 end)
 
 infJump:OnChanged(function(enabled)
-	removeConnection("infJumpConnection")
+	Janitor:Remove("InfJump")
 
 	if not enabled then
 		return
@@ -521,29 +486,37 @@ infJump:OnChanged(function(enabled)
 
 	infJumpDebounce = false
 
-	Connections.infJumpConnection = UserInputService.JumpRequest:Connect(function()
-		if infJumpDebounce then
-			return
-		end
+    Janitor:Add(
+        UserInputService.JumpRequest:Connect(function()
+            if infJumpDebounce then
+                return
+            end
 
-		infJumpDebounce = true
-		Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-		task.wait()
-		infJumpDebounce = false
-	end)
+            infJumpDebounce = true
+            Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+            task.wait()
+            infJumpDebounce = false
+        end),
+        "Disconnect",
+        "InfJump"
+    )
 end)
 
 instantPrompt:OnChanged(function(enabled)
-	removeConnection("promptButtonHoldBegan")
+	Janitor:Remove("InstantProximity")
 
 	if not enabled then
 		return
 	end
 
 	if fireproximityprompt then
-		Connections.promptButtonHoldBegan = ProximityPromptService.PromptButtonHoldBegan:Connect(function(prompt)
-			fireproximityprompt(prompt)
-		end)
+        Janitor:Add(
+            ProximityPromptService.PromptButtonHoldBegan:Connect(function(prompt)
+                fireproximityprompt(prompt)
+            end),
+            "Disconnect",
+            "InstantProximity"
+        )
 	else
 		Library:Notify({
 			Title = "Incompatible Exploit",
@@ -554,19 +527,23 @@ instantPrompt:OnChanged(function(enabled)
 end)
 
 fullBright:OnChanged(function(enabled)
-	removeConnection("brightLoop")
+	Janitor:Remove("BrightLoop")
 
 	if not enabled then
 		return
 	end
 
-	Connections.brightLoop = RunService.RenderStepped:Connect(function()
-		Lighting.Brightness = 2
-		Lighting.ClockTime = 14
-		Lighting.FogEnd = 100000
-		Lighting.GlobalShadows = false
-		Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
-	end)
+    Janitor:Add(
+        RunService.RenderStepped:Connect(function()
+            Lighting.Brightness = 2
+            Lighting.ClockTime = 14
+            Lighting.FogEnd = 100000
+            Lighting.GlobalShadows = false
+            Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
+        end),
+        "Disconnect",
+        "BrightLoop"
+    )
 end)
 
 noRender:OnChanged(function(enabled)
@@ -578,7 +555,7 @@ noRender:OnChanged(function(enabled)
 end)
 
 local function setupAntiAfk(enabled: boolean)
-	removeConnection("antiAfkConnection")
+	Janitor:Remove("AntiAfk")
 
 	if #disabledRobloxConnections > 0 then
 		for _, connection in disabledRobloxConnections do
@@ -604,27 +581,35 @@ local function setupAntiAfk(enabled: boolean)
 			end
 		end
 	else
-		Connections.antiAfkConnection = Player.Idled:Connect(function()
-			VirtualUser:CaptureController()
-			VirtualUser:ClickButton(Vector2.new())
-		end)
+		Janitor:Add(
+            Player.Idled:Connect(function()
+			    VirtualUser:CaptureController()
+			    VirtualUser:ClickButton(Vector2.new())
+		    end),
+            "Disconnect",
+            "AntiAfk"
+        )
 	end
 end
 
 local function setupAutoRejoin(enabled: boolean)
-	removeConnection("autoRejoinConnection")
+	Janitor:Remove("AutoRejoin")
 
 	if not enabled then
 		return
 	end
 
-	Connections.autoRejoinConnection = GuiService.ErrorMessageChanged:Connect(function()
-		rejoin()
-	end)
+	Janitor:Add(
+        GuiService.ErrorMessageChanged:Connect(function()
+		    rejoin()
+	    end),
+        "Disconnect",
+        "AutoRejoin"
+    )
 end
 
 local function setupAutoMod(enabled: boolean)
-	removeConnection("staffWatchJoin")
+    Janitor:Remove("StaffWatchJoin")
 
 	if not enabled then
 		return
@@ -638,12 +623,16 @@ local function setupAutoMod(enabled: boolean)
 
 	local found = {}
 
-	Connections.staffWatchJoin = Players.PlayerAdded:Connect(function(player)
-		local result = getStaffRole(player)
-		if result.Staff then
-			doStaffAction(Options.ActionMod.Value, found)
-		end
-	end)
+	Janitor:Add(
+        Players.PlayerAdded:Connect(function(player)
+		    local result = getStaffRole(player)
+		    if result.Staff then
+			    doStaffAction(Options.ActionMod.Value, found)
+		    end
+	    end),
+        "Disconnect",
+        "StaffWatchJoin"
+    )
 
 	for _, player in Players:GetPlayers() do
 		local result = getStaffRole(player)
