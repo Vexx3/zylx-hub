@@ -63,7 +63,7 @@ local function removeConnection(connectionName: keyof<ConnectionsType>)
     local connection = Connections[connectionName]
     if connection then
         connection:Disconnect()
-        connections[connectionName] = nil
+        Connections[connectionName] = nil
     end
 end
 
