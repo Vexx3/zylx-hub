@@ -637,10 +637,6 @@ Player.CharacterAdded:Connect(function(character)
     setupJumpPower(jumpPowerValue)
 end)
 
-setupAntiAfk(Toggles.AntiAfk.Value)
-setupAutoRejoin(Toggles.AutoRejoin.Value)
-setupAutoMod(Toggles.AntiMod.Value)
-
 ThemeManager:SetLibrary(Library)
 SaveManager:SetLibrary(Library)
 
@@ -648,3 +644,7 @@ SaveManager:BuildConfigSection(Tabs.UISettings)
 
 ThemeManager:ApplyToTab(Tabs.UISettings)
 SaveManager:LoadAutoloadConfig()
+
+setupAntiAfk(Toggles.AntiAfk.Value)
+setupAutoRejoin(Toggles.AutoRejoin.Value)
+setupAutoMod(Toggles.AntiMod.Value)
