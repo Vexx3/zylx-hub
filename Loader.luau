@@ -59,7 +59,7 @@ local JobId = game.JobId
 
 local infJumpDebounce = false
 
-local function removeConnection(connectionName: keyof Connections)
+local function removeConnection(connectionName: keyof<Connections>)
     local connection = connections[connectionName]
     if connection then
         connection:Disconnect()
@@ -586,7 +586,7 @@ local function setupAutoMod(enabled: boolean)
 
     if not enabled then return end
 
-    if not game.CreatorType ~= Enum.CreatorType.Group then
+    if game.CreatorType ~= Enum.CreatorType.Group then
         antiMod:SetValue(false)
         antiMod:Disabled(true)
         return
