@@ -5,7 +5,7 @@ local supportedGames = {
 }
 
 if supportedGames[game.GameId] then
-	loadstring(`{repo}{game.GameId}.luau`)()
+	loadstring(game:HttpGet(`{repo}{game.GameId}.luau`))()
 else
-	loadstring(`{repo}universal.luau`)()
+	loadstring(game:HttpGet(`{repo}universal.luau`))()
 end
