@@ -95,9 +95,8 @@ local function doStaffAction(action: "Kick" | "Shutdown" | "Notify", staffList: 
 end
 
 local Window = Library:CreateWindow({
-	Title = "Zylx Hub",
-	Footer = "v0.0.1",
-	Icon = "zap",
+	Title = "Zylx Hub | Universal",
+	Footer = "v0.0.2 | discord.gg/HYDvPKKTCA",
 })
 
 local Tabs = {
