@@ -41,7 +41,7 @@ local Connections: ConnectionsType = {
 local disabledRobloxConnections: { RBXScriptConnection } = {}
 
 local GROUP_ID = 1200769
-local STAFF_RANK: { string } =
+local STAFF_RANK =
 	{ "Core", "Group Lead - Create", "Group Lead", "Town Hall Leads", "Town Hall Collaborators", "Intern" }
 
 local Player = Players.LocalPlayer
@@ -525,7 +525,7 @@ infJump:OnChanged(function(enabled)
 		if infJumpDebounce then
 			return
 		end
-        
+
 		infJumpDebounce = true
 		Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
 		task.wait()
