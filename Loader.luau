@@ -62,6 +62,7 @@ local infJumpDebounce = false
 local function removeConnection(connectionName: keyof<Connections>)
     local connection = connections[connectionName]
     if connection then
+        print(connection)
         connection:Disconnect()
         connections[connectionName] = nil
     end
@@ -144,24 +145,26 @@ local Groupboxes = {
     UISettingsGroup = Tabs.UISettings:AddLeftGroupbox("Menu", "wrench"),
 }
 
-local walkSpeed = Groupboxes.General:AddDependencyBox()
-local jumpPower = Groupboxes.General:AddDependencyBox()
-local fov = Groupboxes.General:AddDependencyBox()
-
 local walkSpeedToggle = Groupboxes.General:AddToggle("walkSpeedToggle", {
     Text = "WalkSpeed",
     Tooltip = "Change your walkspeed"
 })
+
+local walkSpeed = Groupboxes.General:AddDependencyBox()
 
 local jumpPowerToggle = Groupboxes.General:AddToggle("jumpPowerToggle", {
     Text = "Jump Power",
     Tooltip = "Change your jump power"
 })
 
+local jumpPower = Groupboxes.General:AddDependencyBox()
+
 local fovToggle = Groupboxes.General:AddToggle("fovToggle", {
     Text = "FOV",
     Tooltip = "Adjusts field of view"
 })
+
+local fov = Groupboxes.General:AddDependencyBox()
 
 walkSpeed:SetupDependencies({
     { Toggles.walkSpeedToggle, true }
@@ -626,6 +629,14 @@ antiMod:OnChanged(function(enabled)
     setupAutoMod(enabled)
 end)
 
+ThemeManager:SetLibrary(Library)
+SaveManager:SetLibrary(Library)
+
+SaveManager:BuildConfigSection(Tabs.UISettings)
+
+ThemeManager:ApplyToTab(Tabs.UISettings)
+SaveManager:LoadAutoloadConfig()
+
 Player.CharacterAdded:Connect(function(character)
     Character = character
     Humanoid = character:WaitForChild("Humanoid")
@@ -636,14 +647,6 @@ Player.CharacterAdded:Connect(function(character)
     setupWalkSpeed(walkSpeedValue)
     setupJumpPower(jumpPowerValue)
 end)
-
-ThemeManager:SetLibrary(Library)
-SaveManager:SetLibrary(Library)
-
-SaveManager:BuildConfigSection(Tabs.UISettings)
-
-ThemeManager:ApplyToTab(Tabs.UISettings)
-SaveManager:LoadAutoloadConfig()
 
 setupAntiAfk(Toggles.AntiAfk.Value)
 setupAutoRejoin(Toggles.AutoRejoin.Value)
