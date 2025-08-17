@@ -8,7 +8,11 @@ local TeleportService = game:GetService("TeleportService")
 local UserInputService = game:GetService("UserInputService")
 local VirtualUser = game:GetService("VirtualUser")
 
-local Janitor = loadstring(game:HttpGet("https://raw.githubusercontent.com/howmanysmall/Janitor/refs/heads/main/src/init.luau"))()
+local Maid = loadstring(
+	game:HttpGet(
+		"https://raw.githubusercontent.com/Quenty/NevermoreEngine/refs/heads/main/src/maid/src/Shared/Maid.lua"
+	)
+)()
 
 local disabledRobloxConnections: { RBXScriptConnection } = {}
 
@@ -36,6 +40,8 @@ local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
 local Library = loadstring(game:HttpGet(`{repo}Library.lua`))()
 local ThemeManager = loadstring(game:HttpGet(`{repo}addons/ThemeManager.lua`))()
 local SaveManager = loadstring(game:HttpGet(`{repo}addons/SaveManager.lua`))()
+
+local maid = Maid.new()
 
 local Options = Library.Options
 local Toggles = Library.Toggles
@@ -386,38 +392,30 @@ local function updateJumpPower(power: number)
 end
 
 local function setupWalkSpeed(speed: number)
-	Janitor:Remove("WalkSpeed")
+	maid["WalkSpeed"] = nil
 	updateWalkSpeed(speed)
 
-	Janitor:Add(
-		Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
-			updateWalkSpeed(speed)
-		end),
-		"Disconnect",
-		"WalkSpeed"
-	)
+	maid["WalkSpeed"] = Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+		updateWalkSpeed(speed)
+	end)
 end
 
 local function setupJumpPower(power: number)
-	Janitor:Remove("JumpPower")
+	maid["JumpPower"] = nil
 	updateJumpPower(power)
 
 	local typeOfJump = if Humanoid.UseJumpPower then "JumpPower" else "JumpHeight"
 
-	Janitor:Add(
-		Humanoid:GetPropertyChangedSignal(typeOfJump):Connect(function()
-			updateJumpPower(power)
-		end),
-		"Disconnect",
-		"JumpPower"
-	)
+	maid["JumpPower"] = Humanoid:GetPropertyChangedSignal(typeOfJump):Connect(function()
+		updateJumpPower(power)
+	end)
 end
 
 walkSpeedToggle:OnChanged(function(enabled)
 	if enabled then
 		setupWalkSpeed(Options.WalkSpeedSlider.Value)
 	else
-		Janitor:Remove("WalkSpeed")
+		maid["WalkSpeed"] = nil
 		updateWalkSpeed(originalWalkSpeed)
 	end
 end)
@@ -426,7 +424,7 @@ jumpPowerToggle:OnChanged(function(enabled)
 	if enabled then
 		setupJumpPower(Options.JumpPowerSlider.Value)
 	else
-		Janitor:Remove("JumpPower")
+		maid["JumpPower"] = nil
 		updateJumpPower(originalJumpValue)
 	end
 end)
@@ -452,7 +450,7 @@ fovSlider:OnChanged(function(value)
 end)
 
 noclip:OnChanged(function(enabled)
-	Janitor:Remove("Noclipping")
+	maid["Noclipping"] = nil
 
 	if not enabled then
 		return
@@ -462,21 +460,18 @@ noclip:OnChanged(function(enabled)
 		return
 	end
 
-	Janitor:Add(
-		RunService.Stepped:Connect(function()
-			for _, child in Character:GetDescendants() do
-				if child:IsA("BasePart") and child.CanCollide == true then
-					child.CanCollide = false
-				end
+	maid["Noclipping"] = RunService.Stepped:Connect(function()
+        print("noclip!!")
+		for _, child in Character:GetDescendants() do
+			if child:IsA("BasePart") and child.CanCollide == true then
+				child.CanCollide = false
 			end
-		end),
-		"Disconnect",
-		"Noclipping"
-	)
+		end
+	end)
 end)
 
 infJump:OnChanged(function(enabled)
-	Janitor:Remove("InfJump")
+	maid["InfJump"] = nil
 
 	if not enabled then
 		return
@@ -484,37 +479,29 @@ infJump:OnChanged(function(enabled)
 
 	infJumpDebounce = false
 
-	Janitor:Add(
-		UserInputService.JumpRequest:Connect(function()
-			if infJumpDebounce then
-				return
-			end
+	maid["InfJump"] = UserInputService.JumpRequest:Connect(function()
+		if infJumpDebounce then
+			return
+		end
 
-			infJumpDebounce = true
-			Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-			task.wait()
-			infJumpDebounce = false
-		end),
-		"Disconnect",
-		"InfJump"
-	)
+		infJumpDebounce = true
+		Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+		task.wait()
+		infJumpDebounce = false
+	end)
 end)
 
 instantPrompt:OnChanged(function(enabled)
-	Janitor:Remove("InstantProximity")
+	maid["InstantProximity"] = nil
 
 	if not enabled then
 		return
 	end
 
 	if fireproximityprompt then
-		Janitor:Add(
-			ProximityPromptService.PromptButtonHoldBegan:Connect(function(prompt)
-				fireproximityprompt(prompt)
-			end),
-			"Disconnect",
-			"InstantProximity"
-		)
+		maid["InstantProximity"] = ProximityPromptService.PromptButtonHoldBegan:Connect(function(prompt)
+			fireproximityprompt(prompt)
+		end)
 	else
 		Library:Notify({
 			Title = "Incompatible Exploit",
@@ -525,23 +512,19 @@ instantPrompt:OnChanged(function(enabled)
 end)
 
 fullBright:OnChanged(function(enabled)
-	Janitor:Remove("BrightLoop")
+	maid["BrightLoop"] = nil
 
 	if not enabled then
 		return
 	end
 
-	Janitor:Add(
-		RunService.RenderStepped:Connect(function()
-			Lighting.Brightness = 2
-			Lighting.ClockTime = 14
-			Lighting.FogEnd = 100000
-			Lighting.GlobalShadows = false
-			Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
-		end),
-		"Disconnect",
-		"BrightLoop"
-	)
+	maid["BrightLoop"] = RunService.RenderStepped:Connect(function()
+		Lighting.Brightness = 2
+		Lighting.ClockTime = 14
+		Lighting.FogEnd = 100000
+		Lighting.GlobalShadows = false
+		Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
+	end)
 end)
 
 noRender:OnChanged(function(enabled)
@@ -553,7 +536,7 @@ noRender:OnChanged(function(enabled)
 end)
 
 local function setupAntiAfk(enabled: boolean)
-	Janitor:Remove("AntiAfk")
+	maid["AntiAfk"] = nil
 
 	if #disabledRobloxConnections > 0 then
 		for _, connection in disabledRobloxConnections do
@@ -579,35 +562,27 @@ local function setupAntiAfk(enabled: boolean)
 			end
 		end
 	else
-		Janitor:Add(
-			Player.Idled:Connect(function()
-				VirtualUser:CaptureController()
-				VirtualUser:ClickButton(Vector2.new())
-			end),
-			"Disconnect",
-			"AntiAfk"
-		)
+		maid["AntiAfk"] = Player.Idled:Connect(function()
+			VirtualUser:CaptureController()
+			VirtualUser:ClickButton(Vector2.new())
+		end)
 	end
 end
 
 local function setupAutoRejoin(enabled: boolean)
-	Janitor:Remove("AutoRejoin")
+	maid["AutoRejoin"] = nil
 
 	if not enabled then
 		return
 	end
 
-	Janitor:Add(
-		GuiService.ErrorMessageChanged:Connect(function()
-			rejoin()
-		end),
-		"Disconnect",
-		"AutoRejoin"
-	)
+	maid["AutoRejoin"] = GuiService.ErrorMessageChanged:Connect(function()
+		rejoin()
+	end)
 end
 
 local function setupAutoMod(enabled: boolean)
-	Janitor:Remove("StaffWatchJoin")
+	maid["StaffWatchJoin"] = nil
 
 	if not enabled then
 		return
@@ -621,16 +596,12 @@ local function setupAutoMod(enabled: boolean)
 
 	local found = {}
 
-	Janitor:Add(
-		Players.PlayerAdded:Connect(function(player)
-			local result = getStaffRole(player)
-			if result.Staff then
-				doStaffAction(Options.ActionMod.Value, found)
-			end
-		end),
-		"Disconnect",
-		"StaffWatchJoin"
-	)
+	maid["StaffWatchJoin"] = Players.PlayerAdded:Connect(function(player)
+		local result = getStaffRole(player)
+		if result.Staff then
+			doStaffAction(Options.ActionMod.Value, found)
+		end
+	end)
 
 	for _, player in Players:GetPlayers() do
 		local result = getStaffRole(player)
