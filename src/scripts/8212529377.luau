@@ -125,12 +125,12 @@ local Groupboxes = {
 	UISettingsGroup = Tabs.UISettings:AddLeftGroupbox("Menu", "wrench"),
 }
 
-local infHungerToggle = Groupboxes.Main:AddToggle("InfiniteHunger", {
+Groupboxes.Main:AddToggle("InfiniteHunger", {
 	Text = "Infinite Hunger",
 	Tooltip = "Prevents hunger from decreasing",
 })
 
-local infStaminaToggle = Groupboxes.Main:AddToggle("InfiniteStamina", {
+Groupboxes.Main:AddToggle("InfiniteStamina", {
 	Text = "Infinite Stamina",
 	Tooltip = "Allows you to run indefinitely without getting tired",
 })

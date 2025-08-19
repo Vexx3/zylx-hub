@@ -1,7 +1,7 @@
 local repo = "https://raw.githubusercontent.com/Vexx3/zylx-hub/refs/heads/main/src/scripts/"
 
 local supportedGames = {
-	[102992620118098] = true,
+	[8212529377] = true,
 }
 
 if supportedGames[game.GameId] then
