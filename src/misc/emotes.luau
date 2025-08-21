@@ -1,10 +1,13 @@
 local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
 
-print("hi")
+local Player = Players.LocalPlayer
 
 local Library = loadstring(
 	game:HttpGetAsync("https://raw.githubusercontent.com/deividcomsono/Obsidian/refs/heads/main/Library.lua")
 )()
+
+local currentAnimation
 
 local function fetchEmoteIds()
 	local url = "https://catalog.roblox.com/v1/search/items?category=12&subcategory=39&limit=100"
@@ -73,10 +76,43 @@ local function populateEmotes(dropdown)
 	end
 
 	dropdown:SetValues(dropdownValues)
-	dropdown._emoteMap = emoteMap
+	dropdown._emoteMap = emoteMap -- realll
 end
 
--- UI pls i hate my life (im too lazy to make a ui for this)
+local function playEmote(emoteId)
+    local character = Player.Character or Player.CharacterAdded:Wait()
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if not humanoid then return end
+
+    local animator = humanoid:FindFirstChildOfClass("Animator")
+    if not animator then
+        animator = Instance.new("Animator")
+        animator.Parent = humanoid
+    end
+
+    if currentAnimation then
+        currentAnimation:Stop()
+        currentAnimation = nil
+    end
+
+    local animation = Instance.new("Animation")
+    animation.AnimationId = `rbxassetid://{emoteId}`
+
+    local track = animator:LoadAnimation(animation)
+    track:Play()
+    currentAnimation = track
+end
+
+local function stopEmote()
+    if currentAnimation then
+        currentAnimation:Stop()
+        currentAnimation = nil
+    else
+        Library:Notify("No emote playing", 5)
+    end
+end
+
+-- UI (im too lazy to make a ui for the emotes so pls forgive me)
 
 local Window = Library:CreateWindow({
 	Title = "Zylx Hub | Emotes",
@@ -96,15 +132,6 @@ local emoteDropdown = Groupboxes.EmotesGroupbox:AddDropdown("EmotesDropdown", {
 	Searchable = true,
 })
 
-emoteDropdown:OnChanged(function(value)
-	local id = emoteDropdown._emoteMap and emoteDropdown._emoteMap[value] or nil
-	if id then
-		print(`Selected: {value} (ID: {id})`)
-	else
-		print(`Selected: {value} (ID not found)`)
-	end
-end)
-
 populateEmotes(emoteDropdown)
 
 Groupboxes.EmotesGroupbox:AddButton({
@@ -112,8 +139,9 @@ Groupboxes.EmotesGroupbox:AddButton({
 	Func = function()
 		local selectedName = emoteDropdown.Value
 		local id = emoteDropdown._emoteMap and emoteDropdown._emoteMap[selectedName]
+
 		if id then
-			Library:Notify(`Playing emote {selectedName} with ID {id}`, 5)
+			playEmote(id)
 		else
 			Library:Notify("No emote selected", 5)
 		end
