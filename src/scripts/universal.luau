@@ -9,7 +9,7 @@ local UserInputService = game:GetService("UserInputService")
 local VirtualUser = game:GetService("VirtualUser")
 
 local Maid = loadstring(
-	game:HttpGet(
+	game:HttpGetAsync(
 		"https://raw.githubusercontent.com/Quenty/NevermoreEngine/refs/heads/main/src/maid/src/Shared/Maid.lua"
 	)
 )()
@@ -37,9 +37,9 @@ local JobId = game.JobId
 local infJumpDebounce = false
 
 local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
-local Library = loadstring(game:HttpGet(`{repo}Library.lua`))()
-local ThemeManager = loadstring(game:HttpGet(`{repo}addons/ThemeManager.lua`))()
-local SaveManager = loadstring(game:HttpGet(`{repo}addons/SaveManager.lua`))()
+local Library = loadstring(game:HttpGetAsync(`{repo}Library.lua`))()
+local ThemeManager = loadstring(game:HttpGetAsync(`{repo}addons/ThemeManager.lua`))()
+local SaveManager = loadstring(game:HttpGetAsync(`{repo}addons/SaveManager.lua`))()
 
 local maid = Maid.new()
 
@@ -284,7 +284,7 @@ Groupboxes.Server:AddButton("ServerHop", {
 	Func = function()
 		-- credits for IY
 		local servers = {}
-		local request = game:HttpGet(
+		local request = game:HttpGetAsync(
 			`https://games.roblox.com/v1/games/{PlaceId}/servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true`
 		)
 		local body = HttpService:JSONDecode(request)
