@@ -11,10 +11,7 @@ local function fetchEmoteIds()
 	end)
 
 	if not success then
-		WindUI:Notify({
-			Title = "Emotes",
-			Content = "Failed to fetch emotes",
-		})
+		Library:Notify("Failed to fetch emotes", 5)
 		return {}
 	end
 
@@ -42,7 +39,7 @@ local function fetchEmoteDetails(ids)
 	end)
 
 	if not success then
-		WindUI:Notify({ Title = "Emotes", Content = "Failed to fetch emote details" })
+		Library:Notify("Failed to fetch emote details", 5)
 		return {}
 	end
 
@@ -81,7 +78,7 @@ end
 
 local Window = Library:CreateWindow({
 	Title = "Zylx Hub | Emotes",
-	Footer = "v0.0.1"
+	Footer = "v0.0.1",
 })
 
 local Tabs = {
@@ -89,43 +86,43 @@ local Tabs = {
 }
 
 local Groupboxes = {
-    EmotesGroupbox = Tabs.Emotes:AddRightGroupbox("Play Emotes", "smile")
+	EmotesGroupbox = Tabs.Emotes:AddRightGroupbox("Play Emotes", "smile"),
 }
 
 local emoteDropdown = Groupboxes.EmotesGroupbox:AddDropdown("EmotesDropdown", {
 	Text = "Emotes List",
-    Searchable = true,
+	Searchable = true,
 })
 
 emoteDropdown:OnChanged(function(value)
-    local id = emoteDropdown._emoteMap and emoteDropdown._emoteMap[value] or nil
-    if id then
-        print(`Selected: {value} (ID: {id})`)
-    else
-        print(`Selected: {value} (ID not found)`)
-    end
+	local id = emoteDropdown._emoteMap and emoteDropdown._emoteMap[value] or nil
+	if id then
+		print(`Selected: {value} (ID: {id})`)
+	else
+		print(`Selected: {value} (ID not found)`)
+	end
 end)
 
 populateEmotes(emoteDropdown)
 
 Groupboxes.EmotesGroupbox:AddButton({
-    Text = "Play Emote",
-    Func = function()
-        local selectedName = emoteDropdown.Value
+	Text = "Play Emote",
+	Func = function()
+		local selectedName = emoteDropdown.Value
 		local id = emoteDropdown._emoteMap and emoteDropdown._emoteMap[selectedName]
 		if id then
 			Library:Notify(`Playing emote {selectedName} with ID {id}`, 5)
 		else
 			Library:Notify("No emote selected", 5)
 		end
-    end,
-    Tooltip = "Plays the selected emote"
+	end,
+	Tooltip = "Plays the selected emote",
 })
 
 Groupboxes.EmotesGroupbox:AddButton({
-    Text = "Stop Emote",
-    Func = function()
+	Text = "Stop Emote",
+	Func = function()
 		Library:Notify("Stopping emote", 5)
-    end,
-    Tooltip = "Stops the selected emote"
+	end,
+	Tooltip = "Stops the selected emote",
 })
