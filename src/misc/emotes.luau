@@ -80,6 +80,7 @@ local Window = WindUI:CreateWindow({
     Folder = "EmoteHub",
     Transparent = true,
 
+    --[[
     KeySystem = {
         Note = "Zylx Hub requires a key.",
         API = {
@@ -90,6 +91,7 @@ local Window = WindUI:CreateWindow({
             }
         }
     }
+    ]]
 })
 
 Window:Tag({
