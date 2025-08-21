@@ -1,5 +1,7 @@
 local HttpService = game:GetService("HttpService")
 
+print("hi")
+
 local Library = loadstring(
 	game:HttpGetAsync("https://raw.githubusercontent.com/deividcomsono/Obsidian/refs/heads/main/Library.lua")
 )()
