@@ -141,7 +141,7 @@ Groupboxes.EmotesGroupbox:AddButton({
 	end,
 })
 
-local emoteImage = Groupboxes.InfoGroupbox:AddImage({
+local emoteImage = Groupboxes.InfoGroupbox:AddImage("EmoteImage", {
         Image = "",
         Height = 200,
 })
