@@ -37,7 +37,7 @@ local function fetchEmoteIds()
             break
         end
 
-        task.wait(0.05)
+        --task.wait(0.05)
     end
 
     return ids
