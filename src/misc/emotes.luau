@@ -37,7 +37,7 @@ local function fetchEmoteIds()
             break
         end
 
-        task.wait(0.2)
+        task.wait(0.1)
     end
 
     return ids
@@ -65,7 +65,7 @@ local function fetchEmoteDetails(ids)
             Library:Notify("Failed to fetch some emote details", 5)
         end
 
-        task.wait(0.2)
+        task.wait(0.1)
     end
 
     return emotes
@@ -105,16 +105,18 @@ end
 -- UI (im too lazy to make a ui for the emotes so pls forgive me)
 
 local Window = Library:CreateWindow({
-	Title = "Zylx Hub | Emotes Menu",
-	Footer = "v0.0.1",
+	Title = "Emotes Menu",
+	Footer = "made by _zylx",
 })
 
 local Tabs = {
 	Emotes = Window:AddTab("Emotes", "smile"),
+    ["UI Settings"] = Window:AddTab("UI Settings", "settings"),
 }
 
 local Groupboxes = {
 	EmotesGroupbox = Tabs.Emotes:AddRightGroupbox("Play Emotes", "smile"),
+    MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("Menu", "wrench"),
 }
 
 local emoteDropdown = Groupboxes.EmotesGroupbox:AddDropdown("EmotesDropdown", {
@@ -138,3 +140,50 @@ Groupboxes.EmotesGroupbox:AddButton({
 	end,
 	Tooltip = "Plays the selected emote",
 })
+
+MenuGroup:AddToggle("KeybindMenuOpen", {
+	Default = Library.KeybindFrame.Visible,
+	Text = "Open Keybind Menu",
+	Callback = function(value)
+		Library.KeybindFrame.Visible = value
+	end,
+})
+MenuGroup:AddToggle("ShowCustomCursor", {
+	Text = "Custom Cursor",
+	Default = true,
+	Callback = function(Value)
+		Library.ShowCustomCursor = Value
+	end,
+})
+MenuGroup:AddDropdown("NotificationSide", {
+	Values = { "Left", "Right" },
+	Default = "Right",
+
+	Text = "Notification Side",
+
+	Callback = function(Value)
+		Library:SetNotifySide(Value)
+	end,
+})
+MenuGroup:AddDropdown("DPIDropdown", {
+	Values = { "50%", "75%", "100%", "125%", "150%", "175%", "200%" },
+	Default = "100%",
+
+	Text = "DPI Scale",
+
+	Callback = function(Value)
+		Value = Value:gsub("%%", "")
+		local DPI = tonumber(Value)
+
+		Library:SetDPIScale(DPI)
+	end,
+})
+MenuGroup:AddDivider()
+MenuGroup:AddLabel("Menu bind")
+	:AddKeyPicker("MenuKeybind", { Default = "RightShift", NoUI = true, Text = "Menu keybind" })
+
+MenuGroup:AddButton("Unload", function()
+	Library:Unload()
+end)
+
+Library.ToggleKeybind = Options.MenuKeybind
