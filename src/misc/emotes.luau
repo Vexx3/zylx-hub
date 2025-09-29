@@ -25,7 +25,7 @@ local function fetchEmoteIds()
         end)
 
         if not success or not response or not response.data then
-            Library:Notify("Failed to fetch emotes")
+            Library:Notify("Failed to fetch emotes", 5)
             break
         end
 
@@ -62,7 +62,7 @@ local function fetchEmoteDetails(ids)
                 table.insert(emotes, { name = item.name, id = item.id })
             end
         else
-            Library:Notify("Failed to fetch some emote details")
+            Library:Notify("Failed to fetch some emote details", 5)
         end
     end
 
@@ -70,7 +70,7 @@ local function fetchEmoteDetails(ids)
 end
 
 local function populateEmotes(dropdown)
-    Library:Notify("Loading all emotes")
+    Library:Notify("Loading all emotes", 5)
 	local ids = fetchEmoteIds()
 	if #ids == 0 then
 		return
@@ -89,7 +89,7 @@ local function populateEmotes(dropdown)
 	end
 
 	dropdown:SetValues(dropdownValues)
-    Library:Notify("Loaded all emotes")
+    Library:Notify("Loaded all emotes", 5)
 	dropdown._emoteMap = emoteMap
 end
 
@@ -136,10 +136,9 @@ Groupboxes.EmotesGroupbox:AddButton({
 		if id then
 			playEmote(id)
 		else
-			Library:Notify("No emote selected")
+			Library:Notify("No emote selected", 5)
 		end
 	end,
-	Tooltip = "Plays the selected emote",
 })
 
 local emoteImage = Groupbox.InfoGroupbox:AddImage({
