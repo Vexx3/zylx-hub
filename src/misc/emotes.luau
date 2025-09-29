@@ -142,7 +142,7 @@ Groupboxes.EmotesGroupbox:AddButton({
 })
 
 local emoteImage = Groupboxes.InfoGroupbox:AddImage("EmoteImage", {
-        Image = "",
+        Image = "rbxthumb://type=Asset&id=000000000&w=150&h=150",
         Height = 200,
 })
 
@@ -150,7 +150,7 @@ emoteDropdown:OnChanged(function()
     local id = emoteDropdown._emoteMap and emoteDropdown._emoteMap[Options.EmotesDropdown.Value]
     if not id then return end
 
-    local thumbUrl = string.format("https://www.roblox.com/asset-thumbnail/image?assetId=%d&width=150&height=150&format=png", id)
+    local thumbUrl = string.format("rbxthumb://type=Asset&id=%d&w=150&h=150", id)
     emoteImage:SetImage(thumbUrl)
 end)
 
