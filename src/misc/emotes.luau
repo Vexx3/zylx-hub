@@ -102,20 +102,6 @@ local function playEmote(emoteId)
     currentAnimation = animation
 end
 
-local function fetchThumbnail(assetId)
-    local url = ("https://thumbnails.roblox.com/v1/assets?assetIds=%d&returnPolicy=PlaceHolder&size=150x150&format=Png&isCircular=false"):format(assetId)
-    local success, response = pcall(function()
-        return HttpService:JSONDecode(game:HttpGetAsync(url))
-    end)
-
-    if success and response and response.data and response.data[1] then
-        return response.data[1].imageUrl
-    end
-
-    return nil
-end
-
-
 -- UI (im too lazy to make a ui for the emotes so pls forgive me)
 
 local Window = Library:CreateWindow({
@@ -165,12 +151,8 @@ emoteDropdown:OnChanged(function()
     local id = emoteDropdown._emoteMap and emoteDropdown._emoteMap[Options.EmotesDropdown.Value]
     if not id then return end
 
-    local thumbnail = fetchThumbnail(id)
-    if thumbnail then
-        emoteImage:SetImage(thumbnail)
-    else
-        Library:Notify("Failed to load emote image")
-    end
+    local thumbUrl = string.format("rbxthumb://type=Asset&id=%d&w=150&h=150", id)
+    emoteImage:SetImage(thumbUrl)
 end)
 
 Groupboxes.MenuGroup:AddToggle("KeybindMenuOpen", {
