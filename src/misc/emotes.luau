@@ -36,8 +36,6 @@ local function fetchEmoteIds()
         else
             break
         end
-
-        --task.wait(0.05)
     end
 
     return ids
@@ -64,8 +62,6 @@ local function fetchEmoteDetails(ids)
         else
             Library:Notify("Failed to fetch some emote details", 5)
         end
-
-        task.wait(0.05)
     end
 
     return emotes
