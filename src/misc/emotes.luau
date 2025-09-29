@@ -111,7 +111,7 @@ end
 -- UI (im too lazy to make a ui for the emotes so pls forgive me)
 
 local Window = Library:CreateWindow({
-	Title = "Emotes Menu",
+	Title = "Emotes Hub",
 	Footer = "made by _zylx",
 })
 
@@ -137,10 +137,10 @@ Groupboxes.EmotesGroupbox:AddButton({
 	Text = "Play Emote",
 	Func = function()
 		local selectedName = emoteDropdown.Value
-		local id = emoteDropdown._emoteMap and emoteDropdown._emoteMap[selectedName]
+		local data = emoteDropdown._emoteMap and emoteDropdown._emoteMap[selectedName]
 
-		if id then
-			playEmote(id)
+		if data and data.id then
+			playEmote(data.id)
 		else
 			Library:Notify("No emote selected", 5)
 		end
@@ -152,7 +152,7 @@ local emoteImage = Groupboxes.InfoGroupbox:AddImage("EmoteImage", {
         Height = 200,
 })
 
-local infoLabel = Groupboxes.InfoGroupbox:AddLabel("<b><font color='#FFD700'>Name:</font></b> ???")
+local infoLabel = Groupboxes.InfoGroupbox:AddLabel("<b><font color='#FFD700'>???</font></b>")
 local descLabel = Groupboxes.InfoGroupbox:AddLabel("<i>Description will appear here</i>")
 
 emoteDropdown:OnChanged(function()
