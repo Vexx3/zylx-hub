@@ -37,7 +37,7 @@ local function fetchEmoteIds()
             break
         end
 
-        task.wait(0.1)
+        task.wait(0.05)
     end
 
     return ids
@@ -65,7 +65,7 @@ local function fetchEmoteDetails(ids)
             Library:Notify("Failed to fetch some emote details", 5)
         end
 
-        task.wait(0.1)
+        task.wait(0.05)
     end
 
     return emotes
@@ -141,21 +141,21 @@ Groupboxes.EmotesGroupbox:AddButton({
 	Tooltip = "Plays the selected emote",
 })
 
-MenuGroup:AddToggle("KeybindMenuOpen", {
+Groupboxes.MenuGroup:AddToggle("KeybindMenuOpen", {
 	Default = Library.KeybindFrame.Visible,
 	Text = "Open Keybind Menu",
 	Callback = function(value)
 		Library.KeybindFrame.Visible = value
 	end,
 })
-MenuGroup:AddToggle("ShowCustomCursor", {
+Groupboxes.MenuGroup:AddToggle("ShowCustomCursor", {
 	Text = "Custom Cursor",
 	Default = true,
 	Callback = function(Value)
 		Library.ShowCustomCursor = Value
 	end,
 })
-MenuGroup:AddDropdown("NotificationSide", {
+Groupboxes.MenuGroup:AddDropdown("NotificationSide", {
 	Values = { "Left", "Right" },
 	Default = "Right",
 
@@ -165,7 +165,7 @@ MenuGroup:AddDropdown("NotificationSide", {
 		Library:SetNotifySide(Value)
 	end,
 })
-MenuGroup:AddDropdown("DPIDropdown", {
+Groupboxes.MenuGroup:AddDropdown("DPIDropdown", {
 	Values = { "50%", "75%", "100%", "125%", "150%", "175%", "200%" },
 	Default = "100%",
 
@@ -178,11 +178,11 @@ MenuGroup:AddDropdown("DPIDropdown", {
 		Library:SetDPIScale(DPI)
 	end,
 })
-MenuGroup:AddDivider()
-MenuGroup:AddLabel("Menu bind")
+Groupboxes.MenuGroup:AddDivider()
+Groupboxes.MenuGroup:AddLabel("Menu bind")
 	:AddKeyPicker("MenuKeybind", { Default = "RightShift", NoUI = true, Text = "Menu keybind" })
 
-MenuGroup:AddButton("Unload", function()
+Groupboxes.MenuGroup:AddButton("Unload", function()
 	Library:Unload()
 end)
 
