@@ -8,51 +8,67 @@ local Library = loadstring(
 )()
 
 local function fetchEmoteIds()
-	local url = "https://catalog.roblox.com/v1/search/items?category=12&subcategory=39&limit=100"
-	local success, response = pcall(function()
-		return HttpService:JSONDecode(game:HttpGetAsync(url))
-	end)
+    local baseUrl = "https://catalog.roproxy.com/v1/search/items?category=12&subcategory=39&limit=100"
+    local cursor = nil
+    local ids = {}
 
-	if not success then
-		Library:Notify("Failed to fetch emotes", 5)
-		return {}
-	end
+    while true do
+        local url = baseUrl
+        if cursor then
+            url = url .. "&cursor=" .. cursor
+        end
 
-	local ids = {}
+        local success, response = pcall(function()
+            return HttpService:JSONDecode(game:HttpGetAsync(url))
+        end)
 
-	for _, item in response.data do
-		table.insert(ids, item.id)
-	end
+        if not success or not response or not response.data then
+            Library:Notify("Failed to fetch emotes", 5)
+            break
+        end
 
-	return ids
+        for _, item in response.data do
+            table.insert(ids, item.id)
+        end
+
+        if response.nextPageCursor then
+            cursor = response.nextPageCursor
+        else
+            break
+        end
+
+        task.wait(0.2)
+    end
+
+    return ids
 end
 
 local function fetchEmoteDetails(ids)
-	local url = "https://catalog.roblox.com/v1/catalog/items/details"
-	local requestData = {
-		items = {},
-	}
+    local url = "https://catalog.roproxy.com/v1/catalog/items/details"
+    local emotes = {}
 
-	for _, id in ids do
-		table.insert(requestData.items, { itemType = 1, id = id })
-	end
+    for i = 1, #ids, 50 do
+        local batch = {}
+        for j = i, math.min(i + 49, #ids) do
+            table.insert(batch, { itemType = 1, id = ids[j] })
+        end
 
-	local success, response = pcall(function()
-		return HttpService:JSONDecode(game:HttpPostAsync(url, HttpService:JSONEncode(requestData)))
-	end)
+        local success, response = pcall(function()
+            return HttpService:JSONDecode(game:HttpPostAsync(url, HttpService:JSONEncode({ items = batch })))
+        end)
 
-	if not success then
-		Library:Notify("Failed to fetch emote details", 5)
-		return {}
-	end
+        if success and response and response.data then
+            for _, item in response.data do
+                table.insert(emotes, { name = item.name, id = item.id })
+            end
+        else
+            Library:Notify("Failed to fetch some emote details", 5)
+        end
 
-	local emotes = {}
+        task.wait(0.2)
+    end
 
-	for _, item in response.data do
-		table.insert(emotes, { name = item.name, id = item.id })
-	end
-
-	return emotes
+    return emotes
 end
 
 local function populateEmotes(dropdown)
