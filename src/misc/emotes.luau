@@ -68,6 +68,7 @@ local function fetchEmoteDetails(ids)
 end
 
 local function populateEmotes(dropdown)
+    Library:Notify("Loading all emotes", 5)
 	local ids = fetchEmoteIds()
 	if #ids == 0 then
 		return
@@ -86,6 +87,7 @@ local function populateEmotes(dropdown)
 	end
 
 	dropdown:SetValues(dropdownValues)
+    Library:Notify("Loaded all emotes", 5)
 	dropdown._emoteMap = emoteMap
 end
 
