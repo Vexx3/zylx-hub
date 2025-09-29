@@ -70,7 +70,7 @@ local function fetchEmoteDetails(ids)
 end
 
 local function populateEmotes(dropdown)
-    Library:Notify("Loading all emotes")
+    Library:Notify("Loading all emotes", 5)
 	local ids = fetchEmoteIds()
 	if #ids == 0 then
 		return
@@ -89,7 +89,7 @@ local function populateEmotes(dropdown)
 	end
 
 	dropdown:SetValues(dropdownValues)
-    Library:Notify("Loaded all emotes")
+    Library:Notify("Loaded all emotes", 5)
 	dropdown._emoteMap = emoteMap
 end
 
@@ -116,7 +116,7 @@ local Tabs = {
 
 local Groupboxes = {
 	EmotesGroupbox = Tabs.Emotes:AddRightGroupbox("Play Emotes", "smile"),
-    InfoGroupbox = Tabs.Emotes:AddLeftGroupbox("Info", "info")
+    InfoGroupbox = Tabs.Emotes:AddLeftGroupbox("Info", "info"),
     MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("Menu", "wrench"),
 }
 
