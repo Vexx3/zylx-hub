@@ -69,14 +69,14 @@ local function populateEmotes(dropdown)
 	end
 
 	local dropdownValues = {}
-	local emoteMap = {} -- id for callback
+	local emoteMap = {}
 	for _, emote in emotes do
 		table.insert(dropdownValues, emote.name)
 		emoteMap[emote.name] = emote.id
 	end
 
 	dropdown:SetValues(dropdownValues)
-	dropdown._emoteMap = emoteMap -- realll
+	dropdown._emoteMap = emoteMap
 end
 
 local function playEmote(emoteId)
@@ -84,23 +84,10 @@ local function playEmote(emoteId)
     local humanoid = character:FindFirstChildOfClass("Humanoid")
     if not humanoid then return end
 
-    local animator = humanoid:FindFirstChildOfClass("Animator")
-    if not animator then
-        animator = Instance.new("Animator")
-        animator.Parent = humanoid
-    end
+    local id = `rbxassetid://{emoteId}`
 
-    if currentAnimation then
-        currentAnimation:Stop()
-        currentAnimation = nil
-    end
-
-    local animation = Instance.new("Animation")
-    animation.AnimationId = `rbxassetid://{emoteId}`
-
-    local track = animator:LoadAnimation(animation)
-    track:Play()
-    currentAnimation = track
+    local animation = humanoid:PlayEmoteAndGetAnimTrackById(id)
+    currentAnimation = animation
 end
 
 local function stopEmote()
@@ -115,7 +102,7 @@ end
 -- UI (im too lazy to make a ui for the emotes so pls forgive me)
 
 local Window = Library:CreateWindow({
-	Title = "Zylx Hub | Emotes",
+	Title = "Zylx Hub | Emotes Menu",
 	Footer = "v0.0.1",
 })
 
