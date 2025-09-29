@@ -8,7 +8,7 @@ local Library = loadstring(
 )()
 
 local function fetchEmoteIds()
-    local baseUrl = "https://catalog.roproxy.com/v1/search/items?category=12&subcategory=39&limit=100"
+    local baseUrl = "https://catalog.roblox.com/v1/search/items?category=12&subcategory=39&limit=100"
     local cursor = nil
     local ids = {}
 
@@ -44,7 +44,7 @@ local function fetchEmoteIds()
 end
 
 local function fetchEmoteDetails(ids)
-    local url = "https://catalog.roproxy.com/v1/catalog/items/details"
+    local url = "https://catalog.roblox.com/v1/catalog/items/details"
     local emotes = {}
 
     for i = 1, #ids, 50 do
