@@ -23,7 +23,6 @@ local function fetchEmoteIds()
         end)
 
         if not success or not response or not response.data then
-            warn("Response:", response.data}
             Library:Notify("Failed to fetch emotes", 5)
             break
         end
@@ -63,7 +62,6 @@ local function fetchEmoteDetails(ids)
                 table.insert(emotes, { name = item.name, id = item.id })
             end
         else
-            warn("Response:", response.data}
             Library:Notify("Failed to fetch some emote details", 5)
         end
 
