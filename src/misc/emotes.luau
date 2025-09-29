@@ -7,6 +7,8 @@ local Library = loadstring(
 	game:HttpGetAsync("https://raw.githubusercontent.com/deividcomsono/Obsidian/refs/heads/main/Library.lua")
 )()
 
+local Options = Library.Options
+
 local function fetchEmoteIds()
     local baseUrl = "https://catalog.roblox.com/v1/search/items?category=12&subcategory=39&limit=100"
     local cursor = nil
@@ -23,7 +25,7 @@ local function fetchEmoteIds()
         end)
 
         if not success or not response or not response.data then
-            Library:Notify("Failed to fetch emotes", 5)
+            Library:Notify("Failed to fetch emotes")
             break
         end
 
@@ -60,7 +62,7 @@ local function fetchEmoteDetails(ids)
                 table.insert(emotes, { name = item.name, id = item.id })
             end
         else
-            Library:Notify("Failed to fetch some emote details", 5)
+            Library:Notify("Failed to fetch some emote details")
         end
     end
 
@@ -68,7 +70,7 @@ local function fetchEmoteDetails(ids)
 end
 
 local function populateEmotes(dropdown)
-    Library:Notify("Loading all emotes", 5)
+    Library:Notify("Loading all emotes")
 	local ids = fetchEmoteIds()
 	if #ids == 0 then
 		return
@@ -87,7 +89,7 @@ local function populateEmotes(dropdown)
 	end
 
 	dropdown:SetValues(dropdownValues)
-    Library:Notify("Loaded all emotes", 5)
+    Library:Notify("Loaded all emotes")
 	dropdown._emoteMap = emoteMap
 end
 
@@ -99,6 +101,20 @@ local function playEmote(emoteId)
     local animation = humanoid:PlayEmoteAndGetAnimTrackById(emoteId)
     currentAnimation = animation
 end
+
+local function fetchThumbnail(assetId)
+    local url = ("https://thumbnails.roblox.com/v1/assets?assetIds=%d&returnPolicy=PlaceHolder&size=150x150&format=Png&isCircular=false"):format(assetId)
+    local success, response = pcall(function()
+        return HttpService:JSONDecode(game:HttpGetAsync(url))
+    end)
+
+    if success and response and response.data and response.data[1] then
+        return response.data[1].imageUrl
+    end
+
+    return nil
+end
+
 
 -- UI (im too lazy to make a ui for the emotes so pls forgive me)
 
@@ -114,6 +130,7 @@ local Tabs = {
 
 local Groupboxes = {
 	EmotesGroupbox = Tabs.Emotes:AddRightGroupbox("Play Emotes", "smile"),
+    InfoGroupbox = Tabs.Emotes:AddLeftGroupbox("Info", "info")
     MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("Menu", "wrench"),
 }
 
@@ -133,11 +150,28 @@ Groupboxes.EmotesGroupbox:AddButton({
 		if id then
 			playEmote(id)
 		else
-			Library:Notify("No emote selected", 5)
+			Library:Notify("No emote selected")
 		end
 	end,
 	Tooltip = "Plays the selected emote",
 })
+
+local emoteImage = Groupbox.InfoGroupbox:AddImage({
+        Image = "",
+        Height = 200,
+})
+
+emoteDropdown:OnChanged(function()
+    local id = emoteDropdown._emoteMap and emoteDropdown._emoteMap[Options.EmotesDropdown.Value]
+    if not id then return end
+
+    local thumbnail = fetchThumbnail(id)
+    if thumbnail then
+        emoteImage:SetImage(thumbnail)
+    else
+        Library:Notify("Failed to load emote image")
+    end
+end)
 
 Groupboxes.MenuGroup:AddToggle("KeybindMenuOpen", {
 	Default = Library.KeybindFrame.Visible,
