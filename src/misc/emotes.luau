@@ -7,8 +7,6 @@ local Library = loadstring(
 	game:HttpGetAsync("https://raw.githubusercontent.com/deividcomsono/Obsidian/refs/heads/main/Library.lua")
 )()
 
-local currentAnimation
-
 local function fetchEmoteIds()
 	local url = "https://catalog.roblox.com/v1/search/items?category=12&subcategory=39&limit=100"
 	local success, response = pcall(function()
@@ -84,19 +82,8 @@ local function playEmote(emoteId)
     local humanoid = character:FindFirstChildOfClass("Humanoid")
     if not humanoid then return end
 
-    local id = `rbxassetid://{emoteId}`
-
     local animation = humanoid:PlayEmoteAndGetAnimTrackById(emoteId)
     currentAnimation = animation
-end
-
-local function stopEmote()
-    if currentAnimation then
-        currentAnimation:Stop()
-        currentAnimation = nil
-    else
-        Library:Notify("No emote playing", 5)
-    end
 end
 
 -- UI (im too lazy to make a ui for the emotes so pls forgive me)
@@ -134,12 +121,4 @@ Groupboxes.EmotesGroupbox:AddButton({
 		end
 	end,
 	Tooltip = "Plays the selected emote",
-})
-
-Groupboxes.EmotesGroupbox:AddButton({
-	Text = "Stop Emote",
-	Func = function()
-		Library:Notify("Stopping emote", 5)
-	end,
-	Tooltip = "Stops the selected emote",
 })
