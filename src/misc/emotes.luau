@@ -91,7 +91,7 @@ local function populateEmotes(dropdown)
 	local emoteMap = {}
 	for _, emote in emotes do
 		table.insert(dropdownValues, emote.name)
-		emoteMap[emote.name] = emote.id
+		emoteMap[emote.name] = emote
 	end
 
 	dropdown:SetValues(dropdownValues)
@@ -159,7 +159,7 @@ emoteDropdown:OnChanged(function()
     local data = emoteDropdown._emoteMap and emoteDropdown._emoteMap[Options.EmotesDropdown.Value]
     if not data then return end
 
-    local thumbUrl = string.format("rbxthumb://type=Asset&id=%d&w=150&h=150", data)
+    local thumbUrl = string.format("rbxthumb://type=Asset&id=%d&w=150&h=150", data.id)
     emoteImage:SetImage(thumbUrl)
 
     infoLabel:SetText(string.format("<b><font color='#FFD700'>%s</font></b>", data.name))
