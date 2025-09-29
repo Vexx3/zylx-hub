@@ -65,7 +65,7 @@ local function fetchEmoteDetails(ids)
 
         if success and response and response.data then
             for _, item in response.data do
-                table.insert(emotes, { name = item.name, id = item.id, creator = item.creatorName, description = item.description })
+                table.insert(emotes, { name = item.name, id = item.id, creator = item.creatorName })
             end
         else
             Library:Notify("Failed to fetch some emote details", 5)
@@ -153,7 +153,6 @@ local emoteImage = Groupboxes.InfoGroupbox:AddImage("EmoteImage", {
 })
 
 local infoLabel = Groupboxes.InfoGroupbox:AddLabel("<b><font color='#FFD700'>???</font></b>")
-local descLabel = Groupboxes.InfoGroupbox:AddLabel("<i>Description will appear here</i>")
 
 emoteDropdown:OnChanged(function()
     local data = emoteDropdown._emoteMap and emoteDropdown._emoteMap[Options.EmotesDropdown.Value]
@@ -163,11 +162,6 @@ emoteDropdown:OnChanged(function()
     emoteImage:SetImage(thumbUrl)
 
     infoLabel:SetText(string.format("<b><font color='#FFD700'>%s</font></b>", data.name))
-    if data.description and #data.description > 0 then
-        descLabel:SetText(string.format("<i>%s</i>", data.description))
-    else
-        descLabel:SetText("<i>No description</i>")
-    end
 end)
 
 Groupboxes.MenuGroup:AddToggle("KeybindMenuOpen", {
