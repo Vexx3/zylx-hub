@@ -1,3 +1,9 @@
+if getgenv().EmoteHub_Loaded then
+    return
+end
+
+getgenv().EmoteHub_Loaded = true
+
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 
@@ -59,7 +65,7 @@ local function fetchEmoteDetails(ids)
 
         if success and response and response.data then
             for _, item in response.data do
-                table.insert(emotes, { name = item.name, id = item.id })
+                table.insert(emotes, { name = item.name, id = item.id, creator = item.creatorName, description = item.description })
             end
         else
             Library:Notify("Failed to fetch some emote details", 5)
@@ -146,12 +152,22 @@ local emoteImage = Groupboxes.InfoGroupbox:AddImage("EmoteImage", {
         Height = 200,
 })
 
+local infoLabel = Groupboxes.InfoGroupbox:AddLabel("<b><font color='#FFD700'>Name:</font></b> ???")
+local descLabel = Groupboxes.InfoGroupbox:AddLabel("<i>Description will appear here</i>")
+
 emoteDropdown:OnChanged(function()
-    local id = emoteDropdown._emoteMap and emoteDropdown._emoteMap[Options.EmotesDropdown.Value]
-    if not id then return end
+    local data = emoteDropdown._emoteMap and emoteDropdown._emoteMap[Options.EmotesDropdown.Value]
+    if not data then return end
 
     local thumbUrl = string.format("rbxthumb://type=Asset&id=%d&w=150&h=150", id)
     emoteImage:SetImage(thumbUrl)
+
+    infoLabel:SetText(string.format("<b><font color='#FFD700'>%s</font></b>", data.name))
+    if data.description and #data.description > 0 then
+        descLabel:SetText(string.format("<i>%s</i>", data.description))
+    else
+        descLabel:SetText("<i>No description</i>")
+    end
 end)
 
 Groupboxes.MenuGroup:AddToggle("KeybindMenuOpen", {
