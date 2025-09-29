@@ -86,7 +86,7 @@ local function playEmote(emoteId)
 
     local id = `rbxassetid://{emoteId}`
 
-    local animation = humanoid:PlayEmoteAndGetAnimTrackById(id)
+    local animation = humanoid:PlayEmoteAndGetAnimTrackById(emoteId)
     currentAnimation = animation
 end
 
