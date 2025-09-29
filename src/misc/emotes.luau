@@ -159,7 +159,7 @@ emoteDropdown:OnChanged(function()
     local data = emoteDropdown._emoteMap and emoteDropdown._emoteMap[Options.EmotesDropdown.Value]
     if not data then return end
 
-    local thumbUrl = string.format("rbxthumb://type=Asset&id=%d&w=150&h=150", id)
+    local thumbUrl = string.format("rbxthumb://type=Asset&id=%d&w=150&h=150", data)
     emoteImage:SetImage(thumbUrl)
 
     infoLabel:SetText(string.format("<b><font color='#FFD700'>%s</font></b>", data.name))
