@@ -21,11 +21,11 @@ local Groupboxes = {
     PSGroupbox = Tabs.Main:AddRightGroupbox("Private Server", "server"),
 }
 
-Groupboxes.PSInfo:AddLabel(`Access Code: none`)
+local accessCodeLabel = Groupboxes.PSInfo:AddLabel(`Access Code: none`)
 
 Groupboxes.PSGroupbox:AddButton("Create Private Server", function()
     code = CodeGenerator:GenerateReservedServerCode(game.PlaceId)
-    Groupboxes.PSInfo:SetText(`Access Code: {code}`)
+    accessCodeLabel:SetText(`Access Code: {code}`)
 end)
 
 Groupboxes.PSGroupbox:AddButton("Join Private Server", function()
