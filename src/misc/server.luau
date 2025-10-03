@@ -1,4 +1,4 @@
-local code = nil
+local code
 
 local CodeGenerator = loadstring(game:HttpGet("https://raw.githubusercontent.com/Vexx3/zylx-hub/refs/heads/main/ServerCodeGenerator.luau"))()
 
@@ -17,8 +17,8 @@ local Tabs = {
 }
 
 local Groupboxes = {
-    PSInfo = Tabs.Main:AddLeftGroupbox("Private Server Info", "info")
-    PSGroupbox = Tabs.Main:AddRightGroupbox("Private Server", "server")
+    PSInfo = Tabs.Main:AddLeftGroupbox("Private Server Info", "info"),
+    PSGroupbox = Tabs.Main:AddRightGroupbox("Private Server", "server"),
 }
 
 Groupboxes.PSInfo:AddLabel(`Access Code: none`)
@@ -29,7 +29,9 @@ Groupboxes.PSGroupbox:AddButton("Create Private Server", function()
 end)
 
 Groupboxes.PSGroupbox:AddButton("Join Private Server", function()
-    game.RobloxReplicatedStorage.ContactListIrisInviteTeleport:FireServer(game.PlaceId, "", code)
+    if code ~= nil then
+        game.RobloxReplicatedStorage.ContactListIrisInviteTeleport:FireServer(game.PlaceId, "", code)
+    end
 end)
 
 Groupboxes.PSGroupbox:AddButton("Copy Server Code", function()
