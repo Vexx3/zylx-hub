@@ -7,13 +7,12 @@ local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/deivi
 local Options = Library.Options
 
 local Window = Library:CreateWindow({
-    Title = "Private Server Creator",
-    Footer = "made by _zylx",
+    Title = "Server Creator",
+    Footer = "made by _zylx & credits to HeardKometa for code generator.",
 })
 
 local Tabs = {
     Main = Window:AddTab("Main", "house"),
-    ["UI Settings"] = Window:AddTab("UI Settings", "settings"),
 }
 
 local Groupboxes = {
@@ -47,6 +46,6 @@ Groupboxes.PSGroupbox:AddInput("ServerCodeInput", {
 
 Groupboxes.PSGroupbox:AddButton("Join Server Code", function()
     if Options.ServerCodeInput.Value ~= nil then
-        game.RobloxReplicatedStorage.ContactListIrisInviteTeleport:FireServer(game.PlaceId, "", code)
+        game.RobloxReplicatedStorage.ContactListIrisInviteTeleport:FireServer(game.PlaceId, "", Options.ServerCodeInput.Value)
     end
 end)
