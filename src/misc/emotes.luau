@@ -115,24 +115,26 @@ local Window = Library:CreateWindow({
 })
 
 local Tabs = {
-	Emotes = Window:AddTab("Emotes", "smile"),
+	Animations = Window:AddTab("Emotes", "smile"),
     ["UI Settings"] = Window:AddTab("UI Settings", "settings"),
 }
 
-local Groupboxes = {
-	EmotesGroupbox = Tabs.Emotes:AddRightGroupbox("Play Emotes", "smile"),
-    InfoGroupbox = Tabs.Emotes:AddLeftGroupbox("Info", "info"),
-    MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("Menu", "wrench"),
-}
+local InfoGroup = Tabs.Emotes:AddLeftGroupbox("Info", "info"),
+local MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("Menu", "wrench"),
 
-local emoteDropdown = Groupboxes.EmotesGroupbox:AddDropdown("EmotesDropdown", {
+local AnimationsTabbox = Tabs.Animations:AddRightTabbox("Animations", "smile"),
+
+local EmotesTab = AnimationsTabbox:AddTab("Emotes")
+local AnimationsTab = AnimationsTabbox:AddTab("Animations")
+
+local emoteDropdown = EmotesTab:AddDropdown("EmotesDropdown", {
 	Text = "Emotes List",
 	Searchable = true,
 })
 
 populateEmotes(emoteDropdown)
 
-Groupboxes.EmotesGroupbox:AddButton({
+EmotesTab:AddButton({
 	Text = "Play Emote",
 	Func = function()
 		local selectedName = emoteDropdown.Value
@@ -146,12 +148,12 @@ Groupboxes.EmotesGroupbox:AddButton({
 	end,
 })
 
-local emoteImage = Groupboxes.InfoGroupbox:AddImage("EmoteImage", {
+local emoteImage = InfoGroup:AddImage("EmoteImage", {
         Image = "rbxthumb://type=Asset&id=000000000&w=150&h=150",
         Height = 200,
 })
 
-local infoLabel = Groupboxes.InfoGroupbox:AddLabel("<b><font color='#FFD700'>???</font></b>")
+local infoLabel = InfoGroup:AddLabel("<b><font color='#FFD700'>???</font></b>")
 
 emoteDropdown:OnChanged(function()
     local data = emoteDropdown._emoteMap and emoteDropdown._emoteMap[Options.EmotesDropdown.Value]
@@ -163,21 +165,21 @@ emoteDropdown:OnChanged(function()
     infoLabel:SetText(string.format("<b><font color='#FFD700'>%s</font></b>", data.name))
 end)
 
-Groupboxes.MenuGroup:AddToggle("KeybindMenuOpen", {
+MenuGroup:AddToggle("KeybindMenuOpen", {
 	Default = Library.KeybindFrame.Visible,
 	Text = "Open Keybind Menu",
 	Callback = function(value)
 		Library.KeybindFrame.Visible = value
 	end,
 })
-Groupboxes.MenuGroup:AddToggle("ShowCustomCursor", {
+MenuGroup:AddToggle("ShowCustomCursor", {
 	Text = "Custom Cursor",
 	Default = true,
 	Callback = function(Value)
 		Library.ShowCustomCursor = Value
 	end,
 })
-Groupboxes.MenuGroup:AddDropdown("NotificationSide", {
+MenuGroup:AddDropdown("NotificationSide", {
 	Values = { "Left", "Right" },
 	Default = "Right",
 
@@ -187,7 +189,7 @@ Groupboxes.MenuGroup:AddDropdown("NotificationSide", {
 		Library:SetNotifySide(Value)
 	end,
 })
-Groupboxes.MenuGroup:AddDropdown("DPIDropdown", {
+MenuGroup:AddDropdown("DPIDropdown", {
 	Values = { "50%", "75%", "100%", "125%", "150%", "175%", "200%" },
 	Default = "100%",
 
@@ -200,11 +202,11 @@ Groupboxes.MenuGroup:AddDropdown("DPIDropdown", {
 		Library:SetDPIScale(DPI)
 	end,
 })
-Groupboxes.MenuGroup:AddDivider()
-Groupboxes.MenuGroup:AddLabel("Menu bind")
+MenuGroup:AddDivider()
+MenuGroup:AddLabel("Menu bind")
 	:AddKeyPicker("MenuKeybind", { Default = "RightShift", NoUI = true, Text = "Menu keybind" })
 
-Groupboxes.MenuGroup:AddButton("Unload", function()
+MenuGroup:AddButton("Unload", function()
 	Library:Unload()
 end)
 
