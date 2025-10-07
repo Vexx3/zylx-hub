@@ -105,9 +105,6 @@ local function playEmote(emoteId)
     if not humanoid then return end
 
     local success, animation = humanoid:PlayEmoteAndGetAnimTrackById(emoteId)
-	if success and animation then
-		animation.Looped = true
-	end
 end
 
 -- UI (im too lazy to make a ui for the emotes so pls forgive me)
