@@ -110,8 +110,8 @@ end
 -- UI (im too lazy to make a ui for the emotes so pls forgive me)
 
 local Window = Library:CreateWindow({
-	Title = "Emotes Hub",
-	Footer = "made by _zylx",
+	Title = "<b><font color='#FFD700' size='20'>✨ Emotes <font color='#FFFFFF'>Hub</font></font></b>",
+	Footer = "<font color='#888888' size='12'><i>Made with ❤️ by <font color='#FFD700'>_zylx</font></i></font>",
 })
 
 local Tabs = {
@@ -120,22 +120,25 @@ local Tabs = {
 }
 
 local InfoGroup = Tabs.Animations:AddLeftGroupbox("Info", "info")
+local AnimationsGroup = Tabs.Animations:AddRightGroupbox("Animations", "person-standing")
 local MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("Menu", "wrench")
 
-local AnimationsTabbox = Tabs.Animations:AddRightTabbox("Animations", "person-standing")
-
-local EmotesTab = AnimationsTabbox:AddTab("Emotes")
-local AnimationsTab = AnimationsTabbox:AddTab("Animations")
-
-local emoteDropdown = EmotesTab:AddDropdown("EmotesDropdown", {
+local emoteDropdown = AnimationsGroup:AddDropdown("EmotesDropdown", {
 	Text = "Emotes List",
 	Searchable = true,
 })
 
 populateEmotes(emoteDropdown)
 
-EmotesTab:AddButton({
-	Text = "Play Emote",
+local emoteImage = InfoGroup:AddImage("EmoteImage", {
+        Image = "rbxthumb://type=Asset&id=000000000&w=150&h=150",
+        Height = 200,
+})
+
+local infoLabel = InfoGroup:AddLabel("<b><font color='#FFD700'>???</font></b>")
+
+AnimationsGroup:AddButton({
+	Text = "<b><font color='#FFFFFF'>Play</font> <font color='#FFD700'>Selected Emote</font></b>",
 	Func = function()
 		local selectedName = emoteDropdown.Value
 		local data = emoteDropdown._emoteMap and emoteDropdown._emoteMap[selectedName]
@@ -148,12 +151,9 @@ EmotesTab:AddButton({
 	end,
 })
 
-local emoteImage = InfoGroup:AddImage("EmoteImage", {
-        Image = "rbxthumb://type=Asset&id=000000000&w=150&h=150",
-        Height = 200,
-})
+AnimationsGroup:AddDivider()
 
-local infoLabel = InfoGroup:AddLabel("<b><font color='#FFD700'>???</font></b>")
+AnimationsGroup
 
 emoteDropdown:OnChanged(function()
     local data = emoteDropdown._emoteMap and emoteDropdown._emoteMap[Options.EmotesDropdown.Value]
