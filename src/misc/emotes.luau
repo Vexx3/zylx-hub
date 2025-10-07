@@ -115,14 +115,14 @@ local Window = Library:CreateWindow({
 })
 
 local Tabs = {
-	Animations = Window:AddTab("Emotes", "smile"),
+	Animations = Window:AddTab("Animations", "smile"),
     ["UI Settings"] = Window:AddTab("UI Settings", "settings"),
 }
 
-local InfoGroup = Tabs.Emotes:AddLeftGroupbox("Info", "info"),
-local MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("Menu", "wrench"),
+local InfoGroup = Tabs.Animations:AddLeftGroupbox("Info", "info")
+local MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("Menu", "wrench")
 
-local AnimationsTabbox = Tabs.Animations:AddRightTabbox("Animations", "smile"),
+local AnimationsTabbox = Tabs.Animations:AddRightTabbox("Animations", "person-standing")
 
 local EmotesTab = AnimationsTabbox:AddTab("Emotes")
 local AnimationsTab = AnimationsTabbox:AddTab("Animations")
