@@ -153,8 +153,6 @@ AnimationsGroup:AddButton({
 
 AnimationsGroup:AddDivider()
 
-AnimationsGroup
-
 emoteDropdown:OnChanged(function()
     local data = emoteDropdown._emoteMap and emoteDropdown._emoteMap[Options.EmotesDropdown.Value]
     if not data then return end
