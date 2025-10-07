@@ -104,9 +104,10 @@ local function playEmote(emoteId)
     local humanoid = character:FindFirstChildOfClass("Humanoid")
     if not humanoid then return end
 
-    local animation = humanoid:PlayEmoteAndGetAnimTrackById(emoteId)
-	print(animation)
-	currentAnimation = animation
+    local success, animation = humanoid:PlayEmoteAndGetAnimTrackById(emoteId)
+	if success and animation then
+		animation.Looped = true
+	end
 end
 
 -- UI (im too lazy to make a ui for the emotes so pls forgive me)
