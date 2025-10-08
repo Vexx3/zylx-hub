@@ -132,7 +132,7 @@ end
 
 local function extractAnimationsFromBundle(bundle)
     local animations = {}
-    print(`Extracting from: {bundle.name}`
+    print(`Extracting from: {bundle.name}`)
     for _, item in bundle.items do
         if item.type == "Asset" then
             local success, objs = pcall(function()
