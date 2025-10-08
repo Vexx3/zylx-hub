@@ -15,8 +15,42 @@ local Library = loadstring(
 
 local Options = Library.Options
 
+local function fetchAnimationBundles()
+    local baseUrl = "https://catalog.roblox.com/v1/search/items?category=12&subcategory=38&limit=100"
+    local cursor = nil
+    local bundleIds = {}
+
+    while true do
+        local url = baseUrl
+        if cursor then
+            url = url .. "&cursor=" .. cursor
+        end
+
+        local success, response = pcall(function()
+            return HttpService:JSONDecode(game:HttpGetAsync(url))
+        end)
+
+        if not success or not response or not response.data then
+            Library:Notify("Failed to fetch animation bundles.")
+            break
+        end
+
+        for _, bundle in response.data do
+            table.insert(bundleIds, bundle.id)
+        end
+
+        if response.nextPageCursor then
+            cursor = response.nextPageCursor
+        else
+            break
+        end
+    end
+
+    return bundleIds
+end
+
 local function fetchEmoteIds()
-    local baseUrl = "https://catalog.roblox.com/v1/search/items?category=12&subcategory=39&limit=100"
+    local baseUrl = "https://catalog.roblox.com/v1/search/items?category=12&subcategory=39&limit=100&IncludeNotForSale=true"
     local cursor = nil
     local ids = {}
 
@@ -75,6 +109,51 @@ local function fetchEmoteDetails(ids)
     return emotes
 end
 
+local function fetchBundleDetails(bundleIds)
+    local bundles = {}
+
+    for _, id in bundleIds do
+        local success, response = pcall(function()
+            local url = `https://catalog.roblox.com/v1/bundles/{id}/details`
+            return HttpService:JSONDecode(game:HttpGetAsync(url))
+        end)
+
+        if success and response and response.items then
+            table.insert(bundles, {
+                id = response.id,
+                name = response.name,
+                items = response.items
+            })
+        end
+    end
+
+    return bundles
+end
+
+local function extractAnimationsFromBundle(bundle)
+    local animations = {}
+    for _, item in bundle.items do
+        if item.type == "Asset" then
+            local success, objs = pcall(function()
+                return game:GetObjects(`rbxassetid://{item.id}`)
+            end)
+
+            if success and objs and objs[1] then
+                for _, inst in objs[1]:GetDescendants() do
+                    if inst:IsA("Animation") then
+                        table.insert(animations, {
+                            name = inst.Name,
+                            id = inst.AnimationId,
+                            fromBundle = bundle.name
+                        })
+                    end
+                end
+            end
+        end
+    end
+    return animations
+end
+
 local function populateEmotes(dropdown)
     Library:Notify("Loading all emotes")
 	local ids = fetchEmoteIds()
@@ -99,12 +178,100 @@ local function populateEmotes(dropdown)
 	dropdown._emoteMap = emoteMap
 end
 
+local function populateAnimationPacks(dropdown)
+    Library:Notify("Fetching animation bundles...")
+    local bundleIds = fetchAnimationBundles()
+
+    if #bundleIds == 0 then
+        Library:Notify("No bundles found.")
+        return
+    end
+
+    local bundleDetails = fetchBundleDetails(bundleIds)
+    local allAnimations = {}
+
+    for _, bundle in bundleDetails do
+        local animations = extractAnimationsFromBundle(bundle)
+        for _, anim in animations do
+            table.insert(allAnimations, anim)
+        end
+    end
+
+    if #allAnimations == 0 then
+        Library:Notify("No animations found in bundles.")
+        return
+    end
+
+    local values, animMap = {}, {}
+    for _, anim in allAnimations do
+        local displayName = `{anim.name} - {anim.fromBundle}`
+        table.insert(values, displayName)
+        animMap[displayName] = anim
+    end
+
+    dropdown:SetValues(values)
+    dropdown._animMap = animMap
+    Library:Notify("All animation packs loaded successfully!")
+end
+
 local function playEmote(emoteId)
     local character = Player.Character or Player.CharacterAdded:Wait()
     local humanoid = character:FindFirstChildOfClass("Humanoid")
     if not humanoid then return end
 
     local success, animation = humanoid:PlayEmoteAndGetAnimTrackById(emoteId)
+end
+
+local function applyAnimationPackToPlayer(bundle)
+    local animations = extractAnimationsFromBundle(bundle)
+    local character = Player.Character or Player.CharacterAdded:Wait()
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+
+    if not humanoid then
+        Library:Notify("No humanoid found!")
+        return
+    end
+
+    -- Find or create Animate script
+    local animateScript = character:FindFirstChild("Animate")
+    if not animateScript then
+        Library:Notify("No Animate script found!")
+        return
+    end
+
+    -- Map bundle animations to default Roblox animation slots
+    local map = {
+        walk = { "Walk", "WalkAnim", "WalkAnimation" },
+        run = { "Run", "RunAnim", "RunAnimation" },
+        idle = { "Idle", "Animation1", "Animation2" },
+        jump = { "Jump", "JumpAnim", "JumpAnimation" },
+        fall = { "Fall", "FallAnim", "FallAnimation" },
+        climb = { "Climb", "ClimbAnim", "ClimbAnimation" },
+        swim = { "Swim", "SwimAnim", "SwimAnimation" },
+        swimidle = { "SwimIdle" },
+    }
+
+    for _, anim in animations do
+        for animType, possibleNames in map do
+            for _, name in possibleNames do
+                if anim.name:lower():find(animType) then
+                    local animObj = animateScript:FindFirstChild(animType)
+                    if animObj and animObj:FindFirstChildOfClass("Animation") then
+                        local animation = animObj:FindFirstChildOfClass("Animation")
+                        animation.AnimationId = anim.id
+                    elseif animObj then
+                        local newAnim = Instance.new("Animation")
+                        newAnim.AnimationId = anim.id
+                        newAnim.Name = "Animation"
+                        newAnim.Parent = animObj
+                    end
+                    Library:Notify(`Replaced {animType} animation`)
+                end
+            end
+        end
+    end
+
+    Library:Notify("Animation pack applied!")
 end
 
 -- UI (im too lazy to make a ui for the emotes so pls forgive me)
@@ -130,7 +297,7 @@ local emoteDropdown = AnimationsGroup:AddDropdown("EmotesDropdown", {
 
 populateEmotes(emoteDropdown)
 
-local emoteImage = InfoGroup:AddImage("EmoteImage", {
+local animImage = InfoGroup:AddImage("animImage", {
         Image = "rbxthumb://type=Asset&id=000000000&w=150&h=150",
         Height = 200,
 })
@@ -153,12 +320,60 @@ AnimationsGroup:AddButton({
 
 AnimationsGroup:AddDivider()
 
+local animDropdown = AnimationsGroup:AddDropdown("AnimDropdown", {
+    Text = "Animation Pack List",
+    Searchable = true,
+})
+
 emoteDropdown:OnChanged(function()
     local data = emoteDropdown._emoteMap and emoteDropdown._emoteMap[Options.EmotesDropdown.Value]
     if not data then return end
 
     local thumbUrl = string.format("rbxthumb://type=Asset&id=%d&w=150&h=150", data.id)
-    emoteImage:SetImage(thumbUrl)
+    animImage:SetImage(thumbUrl)
+
+    infoLabel:SetText(string.format("<b><font color='#FFD700'>%s</font></b>", data.name))
+end)
+
+populateAnimationPacks(animDropdown)
+
+AnimationsGroup:AddButton({
+    Text = "<b><font color='#FFFFFF'>Apply</font> <font color='#FFD700'>Selected Animation Pack</font></b>",
+    Func = function()
+        local selectedName = animDropdown.Value
+        local data = animDropdown._animMap and animDropdown._animMap[selectedName]
+
+        if not data or not data.fromBundle then
+            Library:Notify("No animation pack selected.")
+            return
+        end
+
+        local bundleName = data.fromBundle
+        local bundle = nil
+        for _, b in pairs(fetchBundleDetails(fetchAnimationBundles())) do
+            if b.name == bundleName then
+                bundle = b
+                break
+            end
+        end
+
+        if bundle then
+            applyAnimationPackToPlayer(bundle)
+        else
+            Library:Notify("Failed to find that bundle!")
+        end
+    end,
+})
+
+animDropdown:OnChanged(function()
+    local data = animDropdown._animMap and animDropdown._animMap[Options.AnimDropdown.Value]
+    if not data then return end
+
+    local cleanId = data.id:match("%d+")
+    if cleanId then
+        local thumbUrl = string.format("rbxthumb://type=Asset&id=%d&w=150&h=150", cleanId)
+        animImage:SetImage(thumbUrl)
+    end
 
     infoLabel:SetText(string.format("<b><font color='#FFD700'>%s</font></b>", data.name))
 end)
