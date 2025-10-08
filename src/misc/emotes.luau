@@ -238,10 +238,10 @@ local function applyAnimationPackToPlayer(bundle)
         swimidle = {"SwimIdle"},
 	}
 
-	for _, anim in ipairs(animations) do
+	for _, anim in animations do
 		local nameLower = anim.name:lower()
 
-		for animType, animNames in pairs(animMap) do
+		for animType, animNames in animMap do
 			if nameLower == animType then
 				local folder = animateScript:FindFirstChild(animType)
 				if folder then
