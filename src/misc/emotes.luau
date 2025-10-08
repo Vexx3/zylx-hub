@@ -243,11 +243,13 @@ local function applyAnimationPackToPlayer(bundle)
 
 		for animType, animNames in animMap do
 			if nameLower == animType then
+                print(animType)
 				local folder = animateScript:FindFirstChild(animType)
 				if folder then
 					for _, animName in animNames do
 						local animObj = folder:FindFirstChild(animName)
 						if animObj and animObj:IsA("Animation") then
+                            print(animObj.Name, anim.name)
 							animObj.AnimationId = anim.id
 						end
 					end
