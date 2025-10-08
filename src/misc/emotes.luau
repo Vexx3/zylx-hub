@@ -243,6 +243,7 @@ local function applyAnimationPackToPlayer(bundle)
             table.insert(idleAnimations, anim.id)
         end
     end
+    
     local idleSlot = animateScript:FindFirstChild("idle")
     if idleSlot then
         local anim1 = idleSlot:FindFirstChild("Animation1")
@@ -250,6 +251,7 @@ local function applyAnimationPackToPlayer(bundle)
         if anim1 then anim1.AnimationId = idleAnimations[1] or anim1.AnimationId end
         if anim2 then anim2.AnimationId = idleAnimations[2] or anim2.AnimationId end
     end
+
 
     for animType, animNames in animMap do
         if animType == "idle" then continue end
