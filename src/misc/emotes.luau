@@ -215,71 +215,47 @@ local function playEmote(emoteId)
 end
 
 local function applyAnimationPackToPlayer(bundle)
-    local animations = extractAnimationsFromBundle(bundle)
-    print(`Extracted animations: {animations}`)
-    local character = Player.Character or Player.CharacterAdded:Wait()
-    local humanoid = character:FindFirstChildOfClass("Humanoid")
+	local animations = extractAnimationsFromBundle(bundle)
+	if not animations or #animations == 0 then
+		return
+	end
 
-    if not humanoid then return end
+	local player = game.Players.LocalPlayer
+	local character = player.Character or player.CharacterAdded:Wait()
+	local humanoid = character:FindFirstChildOfClass("Humanoid")
+	local animateScript = character:FindFirstChild("Animate")
 
-    local animateScript = character:FindFirstChild("Animate")
-    if not animateScript then return end
+	if not humanoid or not animateScript then
+		return
+	end
 
-    local map = {
-        walk = { "WalkAnim" },
-        run = { "RunAnim" },
-        idle = { "Idle" },
-        jump = { "JumpAnim" },
-        fall = { "FallAnim" },
-        climb = { "ClimbAnim" },
-        swim = { "Swim" },
-        swimidle = { "SwimIdle" },
-    }
+	local animMap = {
+		idle = {"Animation1", "Animation2"},
+		walk = {"WalkAnim"},
+		run = {"RunAnim"},
+		jump = {"JumpAnim"},
+		fall = {"FallAnim"},
+		climb = {"ClimbAnim"},
+		swim = {"Swim", "SwimIdle"},
+	}
 
-    local idleAnimations = {}
-
-    for _, anim in animations do
-        for animType, names in map do
-            for _, name in names do
-                if anim.name:lower():find(animType) then
-                    local slot = animateScript:FindFirstChild(name)
-                    if slot then
-                        if animType == "idle" then
-                            table.insert(idleAnimations, anim.id)
-                        else
-                            for _, animObj in slot:GetChildren() do
-                                if animObj:IsA("Animation") then
-                                    animObj.AnimationId = anim.id
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
-
-    local idleSlot = animateScript:FindFirstChild("idle")
-    if idleSlot then
-        local anim1 = idleSlot:FindFirstChild("Animation1")
-        local anim2 = idleSlot:FindFirstChild("Animation2")
-
-        if idleAnimations[1] and anim1 then
-            anim1.AnimationId = idleAnimations[1]
-        end
-        if idleAnimations[2] and anim2 then
-            anim2.AnimationId = idleAnimations[2]
-        end
-    end
-
-    animateScript.Disabled = true
-    local animator = humanoid:FindFirstChildOfClass("Animator")
-    if animator then
-        for _, track in animator:GetPlayingAnimationTracks() do
-            track:Stop()
-        end
-    end
-    animateScript.Disabled = false
+	for _, anim in animations do
+		for animType, animNames in animMap do
+			if string.find(anim.name:lower(), animType) then
+				local folder = animateScript:FindFirstChild(animType)
+				if folder then
+                    print(folder.Name)
+					for _, animName in animNames do
+						local animObj = folder:FindFirstChild(animName)
+						if animObj and animObj:IsA("Animation") then
+                            print(animObj.Name)
+							animObj.AnimationId = anim.id
+						end
+					end
+				end
+			end
+		end
+	end
 
     Library:Notify("Animation pack applied!")
 end
