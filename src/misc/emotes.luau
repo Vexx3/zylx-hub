@@ -331,41 +331,24 @@ AnimationsGroup:AddButton({
     Text = "<b><font color='#FFFFFF'>Apply</font> <font color='#FFD700'>Selected Animation Pack</font></b>",
     Func = function()
         local selectedName = animDropdown.Value
-        local data = animDropdown._animMap and animDropdown._animMap[selectedName]
+        local bundle = animDropdown._bundleMap and animDropdown._bundleMap[selectedName]
 
-        if not data or not data.fromBundle then
+        if not bundle then
             Library:Notify("No animation pack selected.")
             return
         end
 
-        local bundleName = data.fromBundle
-        local bundle = nil
-        for _, b in pairs(fetchBundleDetails(fetchAnimationBundles())) do
-            if b.name == bundleName then
-                bundle = b
-                break
-            end
-        end
-
-        if bundle then
-            applyAnimationPackToPlayer(bundle)
-        else
-            Library:Notify("Failed to find that bundle!")
-        end
+        applyAnimationPackToPlayer(bundle)
     end,
 })
 
 animDropdown:OnChanged(function()
-    local data = animDropdown._animMap and animDropdown._animMap[Options.AnimDropdown.Value]
-    if not data then return end
+    local bundle = animDropdown._bundleMap and animDropdown._bundleMap[Options.AnimDropdown.Value]
+    if not bundle then return end
 
-    local cleanId = data.id:match("%d+")
-    if cleanId then
-        local thumbUrl = string.format("rbxthumb://type=Asset&id=%d&w=150&h=150", cleanId)
-        animImage:SetImage(thumbUrl)
-    end
-
-    infoLabel:SetText(string.format("<b><font color='#FFD700'>%s</font></b>", data.name))
+    local thumbUrl = string.format("rbxthumb://type=BundleThumbnail&id=%d&w=150&h=150", bundle.id)
+    animImage:SetImage(thumbUrl)
+    infoLabel:SetText(string.format("<b><font color='#FFD700'>%s</font></b>", bundle.name))
 end)
 
 MenuGroup:AddToggle("KeybindMenuOpen", {
