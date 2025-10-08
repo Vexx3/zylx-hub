@@ -132,7 +132,6 @@ end
 
 local function extractAnimationsFromBundle(bundle)
     local animations = {}
-    print(`Extracting from: {bundle.name}`)
     for _, item in bundle.items do
         if item.type == "Asset" then
             local success, objs = pcall(function()
@@ -142,7 +141,6 @@ local function extractAnimationsFromBundle(bundle)
             if success and objs and objs[1] then
                 for _, inst in objs[1]:GetDescendants() do
                     if inst:IsA("Animation") then
-                        print(inst:GetFullName(), inst.AnimationId)
                         table.insert(animations, {
                             name = inst.Name,
                             id = inst.AnimationId,
@@ -244,11 +242,10 @@ local function applyAnimationPackToPlayer(bundle)
 			if string.find(anim.name:lower(), animType) then
 				local folder = animateScript:FindFirstChild(animType)
 				if folder then
-                    print(folder.Name)
 					for _, animName in animNames do
 						local animObj = folder:FindFirstChild(animName)
 						if animObj and animObj:IsA("Animation") then
-                            print(animObj.Name)
+                            print(animObj.Name, anim.name)
 							animObj.AnimationId = anim.id
 						end
 					end
