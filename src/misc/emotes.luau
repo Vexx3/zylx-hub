@@ -142,6 +142,7 @@ local function extractAnimationsFromBundle(bundle)
             if success and objs and objs[1] then
                 for _, inst in objs[1]:GetDescendants() do
                     if inst:IsA("Animation") then
+                        print(inst:GetFullName(), inst.AnimationId)
                         table.insert(animations, {
                             name = inst.Name,
                             id = inst.AnimationId,
