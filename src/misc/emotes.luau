@@ -217,44 +217,56 @@ local function applyAnimationPackToPlayer(bundle)
     local character = Player.Character or Player.CharacterAdded:Wait()
     local humanoid = character:FindFirstChildOfClass("Humanoid")
 
-    if not humanoid then
-        return
-    end
+    if not humanoid then return end
 
-    -- Find or create Animate script
     local animateScript = character:FindFirstChild("Animate")
-    if not animateScript then
-        return
-    end
+    if not animateScript then return end
 
-    -- Map bundle animations to default Roblox animation slots
     local map = {
-        walk = { "Walk", "WalkAnim", "WalkAnimation" },
-        run = { "Run", "RunAnim", "RunAnimation" },
-        idle = { "Idle", "Animation1", "Animation2" },
-        jump = { "Jump", "JumpAnim", "JumpAnimation" },
-        fall = { "Fall", "FallAnim", "FallAnimation" },
-        climb = { "Climb", "ClimbAnim", "ClimbAnimation" },
-        swim = { "Swim", "SwimAnim", "SwimAnimation" },
+        walk = { "WalkAnim" },
+        run = { "RunAnim" },
+        idle = { "idle" },
+        jump = { "JumpAnim" },
+        fall = { "FallAnim" },
+        climb = { "ClimbAnim" },
+        swim = { "Swim" },
         swimidle = { "SwimIdle" },
     }
 
+    local idleAnimations = {}
+
     for _, anim in animations do
-        for animType, possibleNames in map do
-            for _, name in possibleNames do
+        for animType, names in map do
+            for _, name in names do
                 if anim.name:lower():find(animType) then
-                    local animObj = animateScript:FindFirstChild(animType)
-                    if animObj and animObj:FindFirstChildOfClass("Animation") then
-                        local animation = animObj:FindFirstChildOfClass("Animation")
-                        animation.AnimationId = anim.id
-                    elseif animObj then
-                        local newAnim = Instance.new("Animation")
-                        newAnim.AnimationId = anim.id
-                        newAnim.Name = "Animation"
-                        newAnim.Parent = animObj
+                    local slot = animateScript:FindFirstChild(name)
+                    if slot then
+                        -- Handle idle separately
+                        if animType == "idle" then
+                            table.insert(idleAnimations, anim.id)
+                        else
+                            for _, animObj in slot:GetChildren() do
+                                if animObj:IsA("Animation") then
+                                    animObj.AnimationId = anim.id
+                                end
+                            end
+                        end
                     end
                 end
             end
+        end
+    end
+
+    local idleSlot = animateScript:FindFirstChild("idle")
+    if idleSlot then
+        local anim1 = idleSlot:FindFirstChild("Animation1")
+        local anim2 = idleSlot:FindFirstChild("Animation2")
+
+        if anim1 then
+            anim1.AnimationId = idleAnimations[1]
+        end
+        if anim2 then
+            anim2.AnimationId = idleAnimations[2]
         end
     end
 
@@ -262,12 +274,9 @@ local function applyAnimationPackToPlayer(bundle)
         track:Stop()
     end
 
-    animateScript.Disabled = true
-    task.wait()
-    animateScript.Disabled = false
-    
     Library:Notify("Animation pack applied!")
 end
+
 
 -- UI (im too lazy to make a ui for the emotes so pls forgive me)
 
