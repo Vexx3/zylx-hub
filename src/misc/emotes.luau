@@ -272,6 +272,15 @@ local function applyAnimationPackToPlayer(bundle)
         end
     end
 
+    animateScript.Disabled = true
+    local animator = humanoid:FindFirstChildOfClass("Animator")
+    if animator then
+        for _, track in animator:GetPlayingAnimationTracks()) do
+            track:Stop()
+        end
+    end
+    animateScript.Disabled = false
+
     Library:Notify("Animation pack applied!")
 end
 
