@@ -237,28 +237,40 @@ local function applyAnimationPackToPlayer(bundle)
         swimidle = {"SwimIdle"},
 	}
 
-    local idles = {}
+    local idleAnimations = {}
     for _, anim in animations do
-        local nameLower = anim.name:lower()
-        if nameLower == "idle" then
-            table.insert(idles, anim.id)
+        if anim.name:lower() == "idle" then
+            table.insert(idleAnimations, anim.id)
         end
+    end
+    local idleSlot = animateScript:FindFirstChild("idle")
+    if idleSlot then
+        local anim1 = idleSlot:FindFirstChild("Animation1")
+        local anim2 = idleSlot:FindFirstChild("Animation2")
+        if anim1 then anim1.AnimationId = idleAnimations[1] or anim1.AnimationId end
+        if anim2 then anim2.AnimationId = idleAnimations[2] or anim2.AnimationId end
     end
 
     for animType, animNames in animMap do
-        local parentInstance = animateScript:FindFirstChild(animType)
-        if not parentInstance then continue end
+        if animType == "idle" then continue end
 
-        for i, animName in animNames do
-            local animObj = parentInstance:FindFirstChild(animName)
+        local parent = animateScript:FindFirstChild(animType)
+        if not parent then continue end
+
+        for _, animName in animNames do
+            local animObj = parent:FindFirstChild(animName)
             if not animObj or not animObj:IsA("Animation") then continue end
 
-            if animType == "idle" then
-                animObj.AnimationId = idles[i] or animObj.AnimationId
-            else
-                for _, anim in animations do
-                    local nameLower = anim.name:lower()
+            for _, anim in animations do
+                local nameLower = anim.name:lower()
+
+                if animType == "swim" or animType == "swimidle" then
                     if nameLower == animType then
+                        animObj.AnimationId = anim.id
+                        break
+                    end
+                else
+                    if nameLower:find(animType) then
                         animObj.AnimationId = anim.id
                         break
                     end
