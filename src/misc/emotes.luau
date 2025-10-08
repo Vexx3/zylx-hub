@@ -225,7 +225,7 @@ local function applyAnimationPackToPlayer(bundle)
     local map = {
         walk = { "WalkAnim" },
         run = { "RunAnim" },
-        idle = { "idle" },
+        idle = { "Idle" },
         jump = { "JumpAnim" },
         fall = { "FallAnim" },
         climb = { "ClimbAnim" },
@@ -241,7 +241,6 @@ local function applyAnimationPackToPlayer(bundle)
                 if anim.name:lower():find(animType) then
                     local slot = animateScript:FindFirstChild(name)
                     if slot then
-                        -- Handle idle separately
                         if animType == "idle" then
                             table.insert(idleAnimations, anim.id)
                         else
@@ -262,10 +261,10 @@ local function applyAnimationPackToPlayer(bundle)
         local anim1 = idleSlot:FindFirstChild("Animation1")
         local anim2 = idleSlot:FindFirstChild("Animation2")
 
-        if anim1 then
+        if idleAnimations[1] and anim1 then
             anim1.AnimationId = idleAnimations[1]
         end
-        if anim2 then
+        if idleAnimations[2] and anim2 then
             anim2.AnimationId = idleAnimations[2]
         end
     end
