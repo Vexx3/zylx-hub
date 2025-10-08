@@ -255,7 +255,7 @@ local animImage = InfoGroup:AddImage("animImage", {
 })
 local infoLabel = InfoGroup:AddLabel("<b><font color='#FFD700'>???</font></b>")
 
-AnimationsGroup:AddButton({
+AnimGroup:AddButton({
 	Text = "<b><font color='#FFFFFF'>Play</font> <font color='#FFD700'>Selected Emote</font></b>",
 	Func = function()
 		local name = emoteDropdown.Value
@@ -268,7 +268,7 @@ AnimationsGroup:AddButton({
 	end
 })
 
-AnimationsGroup:AddButton({
+AnimGroup:AddButton({
 	Text = "<b><font color='#FFFFFF'>Apply</font> <font color='#FFD700'>Selected Animation Pack</font></b>",
 	Func = function()
 		local name = animDropdown.Value
