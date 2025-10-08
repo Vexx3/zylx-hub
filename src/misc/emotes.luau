@@ -242,7 +242,7 @@ local function applyAnimationPackToPlayer(bundle)
 		local nameLower = anim.name:lower()
 
 		for animType, animNames in pairs(animMap) do
-			if nameLower == animType or nameLower:find(animType .. "$") then
+			if nameLower == animType then
 				local folder = animateScript:FindFirstChild(animType)
 				if folder then
 					for _, animName in animNames do
