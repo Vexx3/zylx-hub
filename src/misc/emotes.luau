@@ -272,10 +272,6 @@ local function applyAnimationPackToPlayer(bundle)
         end
     end
 
-    for _, track in ipairs(humanoid:GetPlayingAnimationTracks()) do
-        track:Stop()
-    end
-
     Library:Notify("Animation pack applied!")
 end
 
