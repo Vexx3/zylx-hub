@@ -275,7 +275,7 @@ local function applyAnimationPackToPlayer(bundle)
     animateScript.Disabled = true
     local animator = humanoid:FindFirstChildOfClass("Animator")
     if animator then
-        for _, track in animator:GetPlayingAnimationTracks()) do
+        for _, track in animator:GetPlayingAnimationTracks() do
             track:Stop()
         end
     end
