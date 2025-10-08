@@ -188,29 +188,19 @@ local function populateAnimationPacks(dropdown)
     end
 
     local bundleDetails = fetchBundleDetails(bundleIds)
-    local allAnimations = {}
-
-    for _, bundle in bundleDetails do
-        local animations = extractAnimationsFromBundle(bundle)
-        for _, anim in animations do
-            table.insert(allAnimations, anim)
-        end
-    end
-
-    if #allAnimations == 0 then
-        Library:Notify("No animations found in bundles.")
+    if #bundleDetails == 0 then
+        Library:Notify("No bundle details found.")
         return
     end
 
-    local values, animMap = {}, {}
-    for _, anim in allAnimations do
-        local displayName = `{anim.name} - {anim.fromBundle}`
-        table.insert(values, displayName)
-        animMap[displayName] = anim
+    local values, bundleMap = {}, {}
+    for _, bundle in bundleDetails do
+        table.insert(values, bundle.name)
+        bundleMap[bundle.name] = bundle
     end
 
     dropdown:SetValues(values)
-    dropdown._animMap = animMap
+    dropdown._bundleMap = bundleMap
     Library:Notify("All animation packs loaded successfully!")
 end
 
