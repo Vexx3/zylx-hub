@@ -258,6 +258,10 @@ local function applyAnimationPackToPlayer(bundle)
         end
     end
 
+    for _, track in ipairs(humanoid:GetPlayingAnimationTracks()) do
+        track:Stop()
+    end
+
     animateScript.Disabled = true
     task.wait()
     animateScript.Disabled = false
