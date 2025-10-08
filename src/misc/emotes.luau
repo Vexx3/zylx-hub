@@ -217,9 +217,8 @@ local function applyAnimationPackToPlayer(bundle)
 	if not animations or #animations == 0 then
 		return
 	end
-
-	local player = game.Players.LocalPlayer
-	local character = player.Character or player.CharacterAdded:Wait()
+    
+	local character = Player.Character or player.CharacterAdded:Wait()
 	local humanoid = character:FindFirstChildOfClass("Humanoid")
 	local animateScript = character:FindFirstChild("Animate")
 
@@ -240,7 +239,7 @@ local function applyAnimationPackToPlayer(bundle)
 
     local idleAnimations = {}
     for _, anim in animations do
-        if anim.name:lower():find("idle") then
+        if anim.name:lower() == "idle" then
             table.insert(idleAnimations, anim.id)
         end
     end
@@ -255,7 +254,7 @@ local function applyAnimationPackToPlayer(bundle)
                         animObj.AnimationId = idleAnimations[i] or animObj.AnimationId
                     else
                         for _, anim in animations do
-                            if anim.name:lower():find(animType) then
+                            if anim.name:lower() == animType then
                                 animObj.AnimationId = anim.id
                                 break
                             end
