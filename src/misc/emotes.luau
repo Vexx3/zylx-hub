@@ -239,7 +239,9 @@ local function applyAnimationPackToPlayer(bundle)
 
     local idleAnimations = {}
     for _, anim in animations do
-        if anim.name:lower() == "idle" then
+        print(anim.name)
+        local n = anim.name:lower()
+        if not (n:find("walk") or n:find("run") or n:find("jump") or n:find("fall") or n:find("climb") or n:find("swim")) then
             table.insert(idleAnimations, anim.id)
         end
     end
