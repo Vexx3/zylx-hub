@@ -218,14 +218,12 @@ local function applyAnimationPackToPlayer(bundle)
     local humanoid = character:FindFirstChildOfClass("Humanoid")
 
     if not humanoid then
-        Library:Notify("No humanoid found!")
         return
     end
 
     -- Find or create Animate script
     local animateScript = character:FindFirstChild("Animate")
     if not animateScript then
-        Library:Notify("No Animate script found!")
         return
     end
 
@@ -255,12 +253,15 @@ local function applyAnimationPackToPlayer(bundle)
                         newAnim.Name = "Animation"
                         newAnim.Parent = animObj
                     end
-                    Library:Notify(`Replaced {animType} animation`)
                 end
             end
         end
     end
 
+    animateScript.Disabled = true
+    task.wait()
+    animateScript.Disabled = false
+    
     Library:Notify("Animation pack applied!")
 end
 
