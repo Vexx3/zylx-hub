@@ -234,18 +234,20 @@ local function applyAnimationPackToPlayer(bundle)
 		jump = {"JumpAnim"},
 		fall = {"FallAnim"},
 		climb = {"ClimbAnim"},
-		swim = {"Swim", "SwimIdle"},
+		swim = {"Swim"},
+        swimidle = {"SwimIdle"},
 	}
 
-	for _, anim in animations do
-		for animType, animNames in animMap do
-			if string.find(anim.name:lower(), animType) then
+	for _, anim in ipairs(animations) do
+		local nameLower = anim.name:lower()
+
+		for animType, animNames in pairs(animMap) do
+			if nameLower == animType or nameLower:find(animType .. "$") then
 				local folder = animateScript:FindFirstChild(animType)
 				if folder then
 					for _, animName in animNames do
 						local animObj = folder:FindFirstChild(animName)
 						if animObj and animObj:IsA("Animation") then
-                            print(animObj.Name, anim.name)
 							animObj.AnimationId = anim.id
 						end
 					end
