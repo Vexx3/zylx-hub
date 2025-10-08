@@ -238,25 +238,33 @@ local function applyAnimationPackToPlayer(bundle)
         swimidle = {"SwimIdle"},
 	}
 
-	for _, anim in animations do
-		local nameLower = anim.name:lower()
+    local idleAnimations = {}
+    for _, anim in animations do
+        if anim.name:lower():find("idle") then
+            table.insert(idleAnimations, anim.id)
+        end
+    end
 
-		for animType, animNames in animMap do
-			if nameLower == animType then
-                print(animType)
-				local folder = animateScript:FindFirstChild(animType)
-				if folder then
-					for _, animName in animNames do
-						local animObj = folder:FindFirstChild(animName)
-						if animObj and animObj:IsA("Animation") then
-                            print(animObj.Name, anim.name)
-							animObj.AnimationId = anim.id
-						end
-					end
-				end
-			end
-		end
-	end
+    for animType, animNames in animMap do
+        local parentInstance = animateScript:FindFirstChild(animType)
+        if parentInstance then
+            for i, animName in animNames do
+                local animObj = parentInstance:FindFirstChild(animName)
+                if animObj and animObj:IsA("Animation") then
+                    if animType == "idle" then
+                        animObj.AnimationId = idleAnimations[i] or animObj.AnimationId
+                    else
+                        for _, anim in animations do
+                            if anim.name:lower():find(animType) then
+                                animObj.AnimationId = anim.id
+                                break
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
 
     Library:Notify("Animation pack applied!")
 end
