@@ -237,28 +237,30 @@ local function applyAnimationPackToPlayer(bundle)
         swimidle = {"SwimIdle"},
 	}
 
-    local idleAnimations = {}
+    local idles = {}
     for _, anim in animations do
-        if anim.name:lower() == "idle" then
-            table.insert(idleAnimations, anim.id)
+        local nameLower = anim.name:lower()
+        if nameLower == "idle" then
+            table.insert(idles, anim.id)
         end
     end
 
     for animType, animNames in animMap do
         local parentInstance = animateScript:FindFirstChild(animType)
-        if parentInstance then
-            for i, animName in animNames do
-                local animObj = parentInstance:FindFirstChild(animName)
-                if animObj and animObj:IsA("Animation") then
-                    if animType == "idle" then
-                        animObj.AnimationId = idleAnimations[i] or animObj.AnimationId
-                    else
-                        for _, anim in animations do
-                            if anim.name:lower() == animType then
-                                animObj.AnimationId = anim.id
-                                break
-                            end
-                        end
+        if not parentInstance then continue end
+
+        for i, animName in animNames do
+            local animObj = parentInstance:FindFirstChild(animName)
+            if not animObj or not animObj:IsA("Animation") then continue end
+
+            if animType == "idle" then
+                animObj.AnimationId = idles[i] or animObj.AnimationId
+            else
+                for _, anim in animations do
+                    local nameLower = anim.name:lower()
+                    if nameLower == animType then
+                        animObj.AnimationId = anim.id
+                        break
                     end
                 end
             end
@@ -267,7 +269,6 @@ local function applyAnimationPackToPlayer(bundle)
 
     Library:Notify("Animation pack applied!")
 end
-
 
 -- UI (im too lazy to make a ui for the emotes so pls forgive me)
 
