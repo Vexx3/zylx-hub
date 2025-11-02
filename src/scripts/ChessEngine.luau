@@ -17,7 +17,7 @@ local SubmitMove = ReplicatedStorage.Chess.SubmitMove
 
 local lastFEN
 
-------------------------------------- UI Setup
+------------------------------------- UI Setup ----------------------------------------------------
 
 local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
 local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
@@ -60,6 +60,14 @@ local stockfishDepthSlider = autoPlayGroupbox:AddSlider("StockfishDepth", {
 
 autoPlayGroupbox:AddLabel("Depth: Higher = stronger moves but slower response, may require a good internet. Lower = faster but weaker moves (more natural mistakes). Recommended: 9-12 for balance")
 
+local stockfishMaxThinkingSlider = autoPlayGroupbox:AddSlider("MaxThinkingTime", {
+        Text = "Stockfish Max Thinking Time",
+        Default = 50,
+        Min = 1,
+        Max = 100,
+        Suffix = "ms",
+})
+
 local moveDelaySlider = autoPlayGroupbox:AddSlider("MoveDelay", {
         Text = "Move Delay",
         Default = 1,
@@ -85,6 +93,7 @@ local function getChessTableset()
     return FEN, IsGameActive
 end
 
+--[[
 local function getStockfishMove(FEN: string)
     local depth = Options.StockfishDepth.Value
     local endpoint = "https://stockfish.online/api/s/v2.php?fen="..HttpService:UrlEncode(FEN).."&depth="..depth
@@ -103,6 +112,32 @@ local function getStockfishMove(FEN: string)
         return nil
     end
 end
+]]
+
+local function getInfoChessAPI(FEN: string) -- retrieves info from chess-api.com
+    local url = "https://chess-api.com/v1"
+
+    local requestBody = {
+        fen = FEN,
+        depth = Options.StockfishDepth.Value,
+        maxThinkingTime = Options.MaxThinkingTime.Value
+    }
+    
+    local success, response = pcall(function()
+        return game:HttpPost(
+            url,
+            HttpService:JSONEncode(requestBody)
+        )
+    end)
+
+    if success and response then
+        local data = HttpService:JSONDecode(response)
+        
+        return data
+    end
+
+    return nil
+end
 
 local function getBestMove(FEN: string)
     local engine = Options.Engine.Value
@@ -113,9 +148,18 @@ local function getBestMove(FEN: string)
     elseif engine == "Sunfish" then
         move = Sunfish:GetBestMove(FEN, 500)
     elseif engine == "Stockfish" then
+        --[[
         move = getStockfishMove(FEN)
         if not move then
             move = Sunfish:GetBestMove(FEN, 500)
+        end
+        ]]
+        local data = getInfoChessAPI(FEN)
+        if data and data.move then
+            move = data.move
+        else
+            Library:Notify("Stockfish failed to analyze the best move. Using sunfish as fallback...")
+            move = Sunfish:GetBestMove(FEN, 2000)
         end
     end
 
