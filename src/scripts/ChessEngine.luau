@@ -49,7 +49,7 @@ local engineDropdown = autoPlayGroupbox:AddDropdown("Engine", {
         Default = 3,
 })
 
-local stockfishDepthSlider = autoPlayGroupbox:AddInput("StockfishDepth", {
+local stockfishDepthSlider = autoPlayGroupbox:AddSlider("StockfishDepth", {
         Text = "Stockfish Depth",
         Default = 9,
         Min = 1,
