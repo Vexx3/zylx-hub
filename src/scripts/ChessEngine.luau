@@ -64,8 +64,7 @@ local function getChessTableset()
 end
 
 local function getStockfishMove(FEN: string)
-    local depth = math.random(9, 12)
-    local endpoint = "https://stockfish.online/api/s/v2.php?fen="..HttpService:UrlEncode(FEN).."&depth="..depth
+    local endpoint = "https://stockfish.online/api/s/v2.php?fen="..HttpService:UrlEncode(FEN).."&depth="..10
     
     local success, response = pcall(function()
         return game:HttpGet(endpoint)
@@ -73,9 +72,10 @@ local function getStockfishMove(FEN: string)
 
     if success and response then
         local data = HttpService:JSONDecode(response)
-
-        local move = data.bestmove:match("bestmove%s+(%w+)")
-        return move
+        if data and data.bestmove then
+            local move = data.bestmove:match("bestmove%s+(%w+)")
+            return move
+        end
     else
         return nil
     end
@@ -84,13 +84,19 @@ end
 local function getBestMove(FEN: string)
     local engine = Options.Engine.Value
 
+    local move
     if engine == "GarboChess" then
-        return GarboChess:GetBestMoveFromFEN(FEN, 1)
+        move = GarboChess:GetBestMoveFromFEN(FEN, 1)
     elseif engine == "Sunfish" then
-        return Sunfish:GetBestMove(FEN, 500)
+        move = Sunfish:GetBestMove(FEN, 500)
     elseif engine == "Stockfish" then
-        return getStockfishMove(FEN)
+        move = getStockfishMove(FEN)
+        if not move then
+            move = Sunfish:GetBestMove(FEN, 500)
+        end
     end
+
+    return move
 end
 
 local function submitMove(move: string)
