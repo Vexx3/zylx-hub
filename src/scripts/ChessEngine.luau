@@ -110,10 +110,37 @@ local function getStockfishInfo(FEN: string)
             end
 
             local info = {}
-            if data.evaluation then info.Evaluation = data.evaluation end
-            if data.mate then info.Mate = data.mate end
+            
+            if data.evaluation then
+                local evalDesc, winChance
+        
+                winChance = math.floor(100 / (1 + math.exp(-eval * 4)) + 0.5)
+        
+                if eval > 2 then
+                    evalDesc = "White is clearly winning"
+                elseif eval > 1 then
+                    evalDesc = "White is slightly winning"
+                elseif eval > 0.3 then
+                    evalDesc = "White has a small advantage"
+                elseif eval < -2 then
+                    evalDesc = "Black is clearly winning"
+                elseif eval < -1 then
+                    evalDesc = "Black is slightly winning"
+                elseif eval < -0.3 then
+                    evalDesc = "Black has a small advantage"
+                else
+                    evalDesc = "The position is equal"
+                end
+        
+                info.Evaluation = string.format("%.2f (%s, ~%d%% win chance)", data.evaluation, evalDesc, winChance)
+            end
+
+            if data.mate ~= nil then
+                info.Mate = data.mate and ("Mate in " .. data.mate) or nil
+            end
+            
             if data.bestmove then info.BestMove = data.bestmove end
-            if data.continuation then info.Continuation = table.concat(data.continuation, ", ") end
+            if data.continuation then info.Continuation = data.continuation end
 
             return move, info
         end
