@@ -46,7 +46,7 @@ local autoPlayToggle = autoPlayGroupbox:AddToggle("AutoMove", {
 local engineDropdown = autoPlayGroupbox:AddDropdown("Engine", {
         Text = "Chess Engine",
         Values = { "GarboChess", "Sunfish", "Stockfish" },
-        Default = 1,
+        Default = 3,
 })
 
 ----------------------------------------------------------------------------------------------------
@@ -63,7 +63,8 @@ local function getChessTableset()
     return FEN, IsGameActive
 end
 
-local function getStockfishMove(FEN: string, depth: number)
+local function getStockfishMove(FEN: string)
+    local depth = math.random(9, 12)
     local endpoint = "https://stockfish.online/api/s/v2.php?fen="..HttpService:UrlEncode(FEN).."&depth="..depth
     
     local success, response = pcall(function()
@@ -80,7 +81,7 @@ local function getStockfishMove(FEN: string, depth: number)
     end
 end
 
-local function getBestMove(FEN)
+local function getBestMove(FEN: string)
     local engine = Options.Engine.Value
 
     if engine == "GarboChess" then
@@ -88,7 +89,7 @@ local function getBestMove(FEN)
     elseif engine == "Sunfish" then
         return Sunfish:GetBestMove(FEN, 500)
     elseif engine == "Stockfish" then
-        return getStockfishMove(FEN, 10)
+        return getStockfishMove(FEN)
     end
 end
 
@@ -115,7 +116,7 @@ local function onHeartbeat(deltaTime)
             local move = getBestMove(FEN)
             if move then
                 task.spawn(function()
-                    task.wait(0.8 + math.random() * 0.7)
+                    task.wait(1 + math.random() * 0.5)
                     submitMove(move)
                 end)
             end
