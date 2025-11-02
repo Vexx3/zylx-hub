@@ -45,13 +45,13 @@ local autoPlayToggle = autoPlayGroupbox:AddToggle("AutoMove", {
 local engineDropdown = autoPlayGroupbox:AddDropdown("Engine", {
         Text = "Chess Engine",
         Values = { "GarboChess", "Sunfish" },
-        Default = 1,
+        Default = 2,
 })
 
 local moveDelaySlider = autoPlayGroupbox:AddSlider("MoveDelay", {
         Text = "Move Delay",
         Default = 2500,
-        Min = 100,
+        Min = 500,
         Max = 8000,
         Rounding = 1,
         Suffix = "ms",
@@ -91,23 +91,30 @@ local function submitMove(move: string)
     SubmitMove:InvokeServer(move)
 end
 
-local function onRenderStepped()
-    if not Toggles.AutoMove.Value then return end
+local elapsed = 0
+local checkInterval = 0.3
+local function onRenderStepped(deltaTime)
+    elapsed += deltaTime
+    if elapsed >= checkInterval then
+        elapsed = 0
+        
+        if not Toggles.AutoMove.Value then return end
     
-    local FEN, IsGameActive = getChessTableset()
-    if not IsGameActive then return end
-
-    if FEN ~= lastFEN then
-        lastFEN = FEN
-
-        local move = getBestMove(FEN)
-        if move then
-            submitMove(move)
+        local FEN, IsGameActive = getChessTableset()
+        if not IsGameActive then return end
+    
+        if FEN ~= lastFEN then
+            lastFEN = FEN
+    
+            local move = getBestMove(FEN)
+            if move then
+                submitMove(move)
+            end
         end
     end
 end
 
-RunService.RenderStepped:Connect(onRenderStepped)
+RunService.Heartbeat:Connect(onRenderStepped)
 
 ThemeManager:SetLibrary(Library)
 SaveManager:SetLibrary(Library)
