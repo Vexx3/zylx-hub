@@ -17,7 +17,7 @@ local SubmitMove = ReplicatedStorage.Chess.SubmitMove
 
 local lastFEN
 
--- UI Setup
+------------------------------------- UI Setup
 
 local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
 local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
@@ -49,6 +49,21 @@ local engineDropdown = autoPlayGroupbox:AddDropdown("Engine", {
         Default = 3,
 })
 
+local stockfishDepth = autoPlayGroupbox:AddInput("StockfishDepth", {
+        Text = "Stockfish Depth",
+        Default = 8,
+        AllowEmpty = false,
+})
+
+local moveDelaySlider = autoPlayGroupbox:AddSlider("MoveDelay", {
+        Text = "Move Delay",
+        Default = 1,
+        Min = 0.5,
+        Max = 3,
+        Rounding = 1,
+        Suffix = "s",
+})
+
 ----------------------------------------------------------------------------------------------------
 
 local function getChessTableset()
@@ -64,7 +79,8 @@ local function getChessTableset()
 end
 
 local function getStockfishMove(FEN: string)
-    local endpoint = "https://stockfish.online/api/s/v2.php?fen="..HttpService:UrlEncode(FEN).."&depth="..10
+    local depth = Options.StockfishDepth.Value
+    local endpoint = "https://stockfish.online/api/s/v2.php?fen="..HttpService:UrlEncode(FEN).."&depth="..depth
     
     local success, response = pcall(function()
         return game:HttpGet(endpoint)
@@ -121,8 +137,9 @@ local function onHeartbeat(deltaTime)
     
             local move = getBestMove(FEN)
             if move then
+                local baseDelay = Options.MoveDelay.Value
                 task.spawn(function()
-                    task.wait(0.8 + math.random() * 0.4)
+                    task.wait(baseDelay + math.random() * 0.3)
                     submitMove(move)
                 end)
             end
