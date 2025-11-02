@@ -20,9 +20,9 @@ local lastFEN
 ------------------------------------- UI Setup ----------------------------------------------------
 
 local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
-local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
-local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
-local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
+local Library = loadstring(game:HttpGetAsync(repo .. "Library.lua"))()
+local ThemeManager = loadstring(game:HttpGetAsync(repo .. "addons/ThemeManager.lua"))()
+local SaveManager = loadstring(game:HttpGetAsync(repo .. "addons/SaveManager.lua"))()
 
 local Options = Library.Options
 local Toggles = Library.Toggles
@@ -99,7 +99,7 @@ local function getStockfishMove(FEN: string)
     local endpoint = "https://stockfish.online/api/s/v2.php?fen="..HttpService:UrlEncode(FEN).."&depth="..depth
     
     local success, response = pcall(function()
-        return game:HttpGet(endpoint)
+        return game:HttpGetAsync(endpoint)
     end)
 
     if success and response then
@@ -122,19 +122,22 @@ local function getInfoChessAPI(FEN: string) -- retrieves info from chess-api.com
         depth = Options.StockfishDepth.Value,
         maxThinkingTime = Options.MaxThinkingTime.Value
     }
+
+    local JSONBody = HttpService:JSONEncode(requestBody)
+    print("Sending to chess-api:", JSONBody)
     
     local success, response = pcall(function()
-        return game:HttpPost(
+        return game:HttpPostAsync(
             url,
             HttpService:JSONEncode(requestBody),
-            false,
             "application/json"
         )
     end)
 
     if success and response then
+        print("Raw response:", response)
         local data = HttpService:JSONDecode(response)
-        print(HttpService:JSONEncode(data))
+        print("Decoded:", HttpService:JSONDecode(data))
         return data
     end
 
