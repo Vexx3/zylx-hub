@@ -115,7 +115,8 @@ local function getStockfishInfo(FEN: string)
                 local eval = data.evaluation
                 local evalDesc, winChance
 
-                local whiteChance = math.floor(100 / (1 + math.exp(-eval * 4)) + 0.5)
+                local whiteChance = 1 / (1 + 10^(-eval / 4))
+                whiteChance = math.floor(whiteChance * 100 + 0.5)
                 
                 if eval > 2 then
                     evalDesc = "White is clearly winning"
