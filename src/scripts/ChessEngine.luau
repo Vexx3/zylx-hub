@@ -32,13 +32,17 @@ local Window = Library:CreateWindow({
         Footer = "Made by _zylx",
 })
 
+-- Structure
 local Tabs = {
     Main = Window:AddTab("Main", "user"),
     UISettings = Window:AddTab("UI Settings", "settings"),
 }
 
 local autoPlayGroupbox = Tabs.Main:AddLeftGroupbox("Autoplay", "play")
+local infoGroupbox = Tabs.Main:AddRightGroupbox("Game Info", "info")
 
+-- Elements
+-- Main
 local autoPlayToggle = autoPlayGroupbox:AddToggle("AutoMove", {
         Text = "Auto Move",
 })
@@ -71,6 +75,10 @@ local moveDelaySlider = autoPlayGroupbox:AddSlider("MoveDelay", {
 
 autoPlayGroupbox:AddLabel("Delay: Adds a pause between moves so you don't play instantly. Short = faster but may look bot-like. Longer = slower but more human-like. Recommended: 0.8-1.5s")
 
+-- Info
+
+local gameInfo = infoGroupbox:AddLabel()
+
 ----------------------------------------------------------------------------------------------------
 
 local function getChessTableset()
@@ -85,7 +93,7 @@ local function getChessTableset()
     return FEN, IsGameActive
 end
 
-local function getStockfishMove(FEN: string)
+local function getStockfishInfo(FEN: string)
     local depth = Options.StockfishDepth.Value
     local endpoint = "https://stockfish.online/api/s/v2.php?fen="..HttpService:UrlEncode(FEN).."&depth="..depth
     
@@ -95,37 +103,68 @@ local function getStockfishMove(FEN: string)
 
     if success and response then
         local data = HttpService:JSONDecode(response)
-        if data and data.bestmove then
-            local move = data.bestmove:match("bestmove%s+(%w+)")
-            return move
+        if data then
+            local move
+            if data.bestmove then
+                move = data.bestmove:match("bestmove%s+(%w+)")
+            end
+
+            local info = {}
+            if data.evaluation then info.Evaluation = data.evaluation end
+            if data.mate then info.Mate = data.mate end
+            if data.bestmove then info.BestMove = data.bestmove end
+            if data.continuation then info.Continuation = table.concat(data.continuation, ", ") end
+
+            return move, info
         end
-    else
-        return nil
     end
+
+    return nil, nil
 end
 
 local function getBestMove(FEN: string)
     local engine = Options.Engine.Value
 
     local move
+    local info = {}
+    
     if engine == "GarboChess" then
         move = GarboChess:GetBestMoveFromFEN(FEN, 15)
     elseif engine == "Sunfish" then
         move = Sunfish:GetBestMove(FEN, 5000)
     elseif engine == "Stockfish" then
-        move = getStockfishMove(FEN)
+        move, info = getStockfishInfo(FEN)
         if not move then
             move = Sunfish:GetBestMove(FEN, 2000)
             Library:Notify("Stockfish failed to analyze the best move. using sunfish as fallback...")
         end
     end
 
-    return move
+    return move, info
 end
 
 local function submitMove(move: string)
     if not move then return end
     SubmitMove:InvokeServer(move)
+end
+
+local function updateGameInfoLabel(info)
+    if Options.Engine.Value ~= "Stockfish" then
+        gameInfo:SetText()
+        return
+    end
+
+    local parts = {}
+    if info.Evaluation then table.insert(parts, `Evaluation: {info.Evaluation}`) end
+    if info.Mate then table.insert(parts, `Mate in: {info.Mate}`) end
+    if info.BestMove then table.insert(parts, `Best Move: {info.BestMove}`) end
+    if info.Continuation then table.insert(parts, `Continuation: {info.Continuation}`) end
+
+    if #parts == 0 then
+        gameInfo:SetText()
+    else
+        gameInfo:SetText(table.concat(parts, "\n"))
+    end
 end
 
 local elapsed = 0
@@ -143,7 +182,9 @@ local function onHeartbeat(deltaTime)
         if FEN ~= lastFEN then
             lastFEN = FEN
     
-            local move = getBestMove(FEN)
+            local move, info = getBestMove(FEN)
+            updateGameInfoLabel(info)
+            
             if move then
                 local baseDelay = Options.MoveDelay.Value
                 task.spawn(function()
