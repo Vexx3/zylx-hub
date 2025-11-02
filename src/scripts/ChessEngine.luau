@@ -48,12 +48,13 @@ local engineDropdown = autoPlayGroupbox:AddDropdown("Engine", {
         Default = 1,
 })
 
-local thinkTimeSlider = autoPlayGroupbox:AddSlider("ThinkTime", {
-        Text = "Think Time",
+local moveDelaySlider = autoPlayGroupbox:AddSlider("MoveDelay", {
+        Text = "Move Delay",
         Default = 2500,
         Min = 100,
         Max = 8000,
         Rounding = 1,
+        Suffix = "ms",
 })
 
 ----------------------------------------------------------------------------------------------------
@@ -72,14 +73,14 @@ end
 
 local function getBestMove(FEN)
     local engine = Options.Engine.Value
-    local thinkTime = Options.ThinkTime.Value
+    local moveDelay = Options.MoveDelay.Value
 
     local move
 
     if engine == "GarboChess" then
-        move = GarboChess:GetBestMoveFromFEN(FEN, thinkTime)
+        move = GarboChess:GetBestMoveFromFEN(FEN, moveDelay / 1000)
     elseif engine == "Sunfish" then
-        move = Sunfish:GetBestMove(FEN, thinkTime)
+        move = Sunfish:GetBestMove(FEN, moveDelay)
     end
 
     return move
