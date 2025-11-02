@@ -53,9 +53,9 @@ autoPlayGroupbox:AddLabel("GarboChess/Sunfish: Built-in, balanced performance. S
 
 local stockfishDepthSlider = autoPlayGroupbox:AddSlider("StockfishDepth", {
         Text = "Stockfish Depth",
-        Default = 9,
+        Default = 12,
         Min = 1,
-        Max = 15,
+        Max = 18,
 })
 
 autoPlayGroupbox:AddLabel("Depth: Higher = stronger moves but slower response, may require a good internet. Lower = faster but weaker moves (more natural mistakes). Recommended: 9-12 for balance")
@@ -126,7 +126,9 @@ local function getInfoChessAPI(FEN: string) -- retrieves info from chess-api.com
     local success, response = pcall(function()
         return game:HttpPost(
             url,
-            HttpService:JSONEncode(requestBody)
+            HttpService:JSONEncode(requestBody),
+            false,
+            "application/json"
         )
     end)
 
