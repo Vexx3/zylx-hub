@@ -66,7 +66,7 @@ autoPlayGroupbox:AddLabel("Depth: Higher = stronger moves but slower response, m
 
 local moveDelaySlider = autoPlayGroupbox:AddSlider("MoveDelay", {
         Text = "Move Delay",
-        Default = 1,
+        Default = 1.5,
         Min = 0.5,
         Max = 3,
         Rounding = 1,
@@ -114,9 +114,9 @@ local function getStockfishInfo(FEN: string)
             if data.evaluation then
                 local eval = data.evaluation
                 local evalDesc, winChance
-        
-                winChance = math.floor(100 / (1 + math.exp(-eval * 4)) + 0.5)
-        
+
+                local whiteChance = math.floor(100 / (1 + math.exp(-eval * 4)) + 0.5)
+                
                 if eval > 2 then
                     evalDesc = "White is clearly winning"
                 elseif eval > 1 then
@@ -132,8 +132,15 @@ local function getStockfishInfo(FEN: string)
                 else
                     evalDesc = "The position is equal"
                 end
-        
-                info.Evaluation = string.format("%.2f (%s, ~%d%% win chance)", eval, evalDesc, winChance)
+
+                local percentText
+                if eval >= 0 then
+                    percentText = string.format("~%d%% White", whiteChance)
+                else
+                    percentText = string.format("~%d%% Black", 100 - whiteChance)
+                end
+                
+                info.Evaluation = string.format("%.2f (%s, %s win chance)", eval, evalDesc, percentText)
             end
 
             if data.mate ~= nil then
