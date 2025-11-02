@@ -49,17 +49,6 @@ local engineDropdown = autoPlayGroupbox:AddDropdown("Engine", {
         Default = 1,
 })
 
---[[
-local moveDelaySlider = autoPlayGroupbox:AddSlider("MoveDelay", {
-        Text = "Move Delay",
-        Default = 2500,
-        Min = 500,
-        Max = 8000,
-        Rounding = 1,
-        Suffix = "ms",
-})
-]]
-
 ----------------------------------------------------------------------------------------------------
 
 local function getChessTableset()
@@ -93,13 +82,11 @@ end
 
 local function getBestMove(FEN)
     local engine = Options.Engine.Value
-    --local moveDelay = Options.MoveDelay.Value
 
     if engine == "GarboChess" then
-        --move = GarboChess:GetBestMoveFromFEN(FEN, moveDelay / 1000)
-        return GarboChess:GetBestMoveFromFEN(FEN, 0.15)
+        return GarboChess:GetBestMoveFromFEN(FEN, 1)
     elseif engine == "Sunfish" then
-        return Sunfish:GetBestMove(FEN, 1)
+        return Sunfish:GetBestMove(FEN, 500)
     elseif engine == "Stockfish" then
         return getStockfishMove(FEN, 10)
     end
@@ -127,7 +114,10 @@ local function onHeartbeat(deltaTime)
     
             local move = getBestMove(FEN)
             if move then
-                submitMove(move)
+                task.spawn(function()
+                    task.wait(1 + math.random() * 0.5)
+                    submitMove(move)
+                end)
             end
         end
     end
