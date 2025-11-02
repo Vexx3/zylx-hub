@@ -48,6 +48,7 @@ local engineDropdown = autoPlayGroupbox:AddDropdown("Engine", {
         Default = 2,
 })
 
+--[[
 local moveDelaySlider = autoPlayGroupbox:AddSlider("MoveDelay", {
         Text = "Move Delay",
         Default = 2500,
@@ -56,6 +57,7 @@ local moveDelaySlider = autoPlayGroupbox:AddSlider("MoveDelay", {
         Rounding = 1,
         Suffix = "ms",
 })
+]]
 
 ----------------------------------------------------------------------------------------------------
 
@@ -73,14 +75,15 @@ end
 
 local function getBestMove(FEN)
     local engine = Options.Engine.Value
-    local moveDelay = Options.MoveDelay.Value
+    --local moveDelay = Options.MoveDelay.Value
 
     local move
 
     if engine == "GarboChess" then
-        move = GarboChess:GetBestMoveFromFEN(FEN, moveDelay / 1000)
+        --move = GarboChess:GetBestMoveFromFEN(FEN, moveDelay / 1000)
+        move = GarboChess:GetBestMoveFromFEN(FEN, 0.15)
     elseif engine == "Sunfish" then
-        move = Sunfish:GetBestMove(FEN, moveDelay)
+        move = Sunfish:GetBestMove(FEN, 1)
     end
 
     return move
@@ -93,7 +96,7 @@ end
 
 local elapsed = 0
 local checkInterval = 0.3
-local function onRenderStepped(deltaTime)
+local function onHeartbeat(deltaTime)
     elapsed += deltaTime
     if elapsed >= checkInterval then
         elapsed = 0
@@ -114,7 +117,7 @@ local function onRenderStepped(deltaTime)
     end
 end
 
-RunService.Heartbeat:Connect(onRenderStepped)
+RunService.Heartbeat:Connect(onHeartbeat)
 
 ThemeManager:SetLibrary(Library)
 SaveManager:SetLibrary(Library)
