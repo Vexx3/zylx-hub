@@ -122,7 +122,7 @@ local function onHeartbeat(deltaTime)
             local move = getBestMove(FEN)
             if move then
                 task.spawn(function()
-                    task.wait(1 + math.random() * 0.5)
+                    task.wait(0.8 + math.random() * 0.4)
                     submitMove(move)
                 end)
             end
