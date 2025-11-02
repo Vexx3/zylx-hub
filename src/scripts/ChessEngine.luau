@@ -49,12 +49,16 @@ local engineDropdown = autoPlayGroupbox:AddDropdown("Engine", {
         Default = 3,
 })
 
+autoPlayGroupbox:AddLabel("GarboChess/Sunfish: Built-in, balanced performance. Stockfish: External, stronger but slower at higher depths.")
+
 local stockfishDepthSlider = autoPlayGroupbox:AddSlider("StockfishDepth", {
         Text = "Stockfish Depth",
         Default = 9,
         Min = 1,
         Max = 15,
 })
+
+autoPlayGroupbox:AddLabel("Depth: Higher = stronger moves but slower response, may require a good internet. Lower = faster but weaker moves (more natural mistakes). Recommended: 9-12 for balance")
 
 local moveDelaySlider = autoPlayGroupbox:AddSlider("MoveDelay", {
         Text = "Move Delay",
@@ -64,6 +68,8 @@ local moveDelaySlider = autoPlayGroupbox:AddSlider("MoveDelay", {
         Rounding = 1,
         Suffix = "s",
 })
+
+autoPlayGroupbox:AddLabel("Delay: Adds a pause between moves so you don't play instantly. Short = faster but may look bot-like. Longer = slower but more human-like. Recommended: 0.8-1.5s")
 
 ----------------------------------------------------------------------------------------------------
 
