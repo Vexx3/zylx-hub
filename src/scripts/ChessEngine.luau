@@ -1,3 +1,4 @@
+local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -44,8 +45,8 @@ local autoPlayToggle = autoPlayGroupbox:AddToggle("AutoMove", {
 
 local engineDropdown = autoPlayGroupbox:AddDropdown("Engine", {
         Text = "Chess Engine",
-        Values = { "GarboChess", "Sunfish" },
-        Default = 2,
+        Values = { "GarboChess", "Sunfish", "Stockfish" },
+        Default = 1,
 })
 
 --[[
@@ -73,20 +74,35 @@ local function getChessTableset()
     return FEN, IsGameActive
 end
 
+local function getStockfishMove(FEN: string, depth: number)
+    local endpoint = "https://stockfish.online/api/s/v2.php?fen="..HttpService:UrlEncode(FEN).."&depth="..depth
+    
+    local success, response = pcall(function()
+        return game:HttpGet(endpoint)
+    end)
+
+    if success and response then
+        local data = HttpService:JSONDecode(response)
+
+        local move = data.bestmove:match("bestmove%s+(%w+)")
+        return move
+    else
+        return nil
+    end
+end
+
 local function getBestMove(FEN)
     local engine = Options.Engine.Value
     --local moveDelay = Options.MoveDelay.Value
 
-    local move
-
     if engine == "GarboChess" then
         --move = GarboChess:GetBestMoveFromFEN(FEN, moveDelay / 1000)
-        move = GarboChess:GetBestMoveFromFEN(FEN, 0.15)
+        return GarboChess:GetBestMoveFromFEN(FEN, 0.15)
     elseif engine == "Sunfish" then
-        move = Sunfish:GetBestMove(FEN, 1)
+        return Sunfish:GetBestMove(FEN, 1)
+    elseif engine == "Stockfish" then
+        return getStockfishMove(FEN, 10)
     end
-
-    return move
 end
 
 local function submitMove(move: string)
