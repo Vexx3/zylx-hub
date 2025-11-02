@@ -132,7 +132,7 @@ local function getInfoChessAPI(FEN: string) -- retrieves info from chess-api.com
 
     if success and response then
         local data = HttpService:JSONDecode(response)
-        
+        print(data, data.move)
         return data
     end
 
