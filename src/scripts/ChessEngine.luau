@@ -112,6 +112,7 @@ local function getStockfishInfo(FEN: string)
             local info = {}
             
             if data.evaluation then
+                local eval = data.evaluation
                 local evalDesc, winChance
         
                 winChance = math.floor(100 / (1 + math.exp(-eval * 4)) + 0.5)
@@ -132,7 +133,7 @@ local function getStockfishInfo(FEN: string)
                     evalDesc = "The position is equal"
                 end
         
-                info.Evaluation = string.format("%.2f (%s, ~%d%% win chance)", data.evaluation, evalDesc, winChance)
+                info.Evaluation = string.format("%.2f (%s, ~%d%% win chance)", eval, evalDesc, winChance)
             end
 
             if data.mate ~= nil then
