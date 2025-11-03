@@ -53,8 +53,6 @@ local engineDropdown = autoPlayGroupbox:AddDropdown("Engine", {
         Default = 3,
 })
 
-autoPlayGroupbox:AddLabel("GarboChess/Sunfish: Built-in, balanced performance. Stockfish: External, stronger but slower at higher depths.")
-
 local stockfishDepthSlider = autoPlayGroupbox:AddSlider("StockfishDepth", {
         Text = "Stockfish Depth",
         Default = 9,
@@ -66,14 +64,12 @@ autoPlayGroupbox:AddLabel("Depth: Higher = stronger moves but slower response, m
 
 local moveDelaySlider = autoPlayGroupbox:AddSlider("MoveDelay", {
         Text = "Move Delay",
-        Default = 1.5,
-        Min = 0.5,
-        Max = 3,
+        Default = 1.6,
+        Min = 0.6,
+        Max = 4.5,
         Rounding = 1,
         Suffix = "s",
 })
-
-autoPlayGroupbox:AddLabel("Delay: Adds a pause between moves so you don't play instantly. Short = faster but may look bot-like. Longer = slower but more human-like. Recommended: 0.8-1.5s")
 
 -- Info
 
@@ -203,6 +199,15 @@ local function updateGameInfoLabel(info)
     end
 end
 
+local function getDelay(baseDelay: number)
+    local variation = baseDelay * (0.3 + math.random() * 0.4)
+    local addOrSubtract = (math.random() < 0.5) and -1 or 1
+    local finalDelay = math.clamp(baseDelay + addOrSubtract * variation * math.random(), 0.3, 6)
+    finalDelay += math.random() * 0.25
+    
+    return finalDelay
+end
+
 local elapsed = 0
 local checkInterval = 0.3
 local function onHeartbeat(deltaTime)
@@ -222,9 +227,9 @@ local function onHeartbeat(deltaTime)
             updateGameInfoLabel(info)
             
             if move then
-                local baseDelay = Options.MoveDelay.Value
+                local delay = getDelay(Options.MoveDelay.Value)
                 task.spawn(function()
-                    task.wait(baseDelay + math.random() * 0.3)
+                    task.wait(delay)
                     submitMove(move)
                 end)
             end
